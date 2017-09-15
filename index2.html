@@ -12,10 +12,9 @@
 <body>
     <script>
         var app = new PIXI.Application(window.innerWidth, window.innerHeight);
-        var friendIntro = new PIXI.Application(window.innerWidth, window.innerHeight);
 
         document.body.appendChild(app.view);
-        document.body.appendChild(friendIntro.view);
+
 
         function inheritPrototype(childObject, parentObject) {
             var copyOfParent = Object.create(parentObject.prototype);
@@ -23,14 +22,20 @@
             childObject.prototype = copyOfParent;
         }
 
-        function Friend(texture, name) {
+
+        function Friend(texture, name, xPos) {
+            friendCntr = new PIXI.Container();
+            this.marginLeft = (window.innerWidth - 800) / 2;
+            this.marginTop = (window.innerHeight - 500) / 2;
+            yPos = this.marginTop + 200;
+
             PIXI.Sprite.call(this, texture);
 
             this.name = new PIXI.Text(name, {
                 fontFamily: "Bangers",
                 fontSize: 26,
                 fill: "orange"
-             });
+            });
 
             this.interactive = true;
             this.buttonMode = true;
@@ -41,25 +46,65 @@
             this.circle.beginFill(0xE66D22, 1);
             this.circle.drawCircle(60, 60, 50);
             this.circle.endFill();
+            this.circle.alpha = 0;
 
-            this.mouseover = function(mouseData){
-              this.generateInteraction();
+            this.position.set(xPos, yPos);
+            this.scale.set(0.2, 0.2);
+            this.name.position.set(xPos, yPos + 150);
+            // app.stage.addChild(this);
+            // this
+            //     .on('pointerover', generateInteraction)
+            //     .on('mouseout', deleteInteraction)
 
-               }
-            this.mouseout = function(mouseData){
-              this.deleteInteraction();
+            friendCntr.addChild(this.circle);
+            friendCntr.addChild(this);
+            friendCntr.addChild(this.name);
 
-              }
+            app.stage.addChild(friendCntr);
+
+
+            this.generateInteraction = function() {
+                this.circle.alpha = 1;
+                this.circle.position.set(xPos, yPos);
+                this.scale.set(.25);
+                console.log(this);
+
+            }
+
+            this.deleteInteraction = function() {
+                this.circle.alpha = 0;
+                this.scale.set(.2);
+
+            }
+
+            this.mouseover = function(mouseData) {
+                this.generateInteraction();
+
+            }
+            this.mouseout = function(mouseData) {
+                this.deleteInteraction();
+
+            }
 
             // this.click = function(){
             //     app.stage.visible = false;
-            //     friendIntro.stage.visible = true;
+            //     this.prepareFriendIntroStage();
             //
             //   }
 
+        };
+
+        Friend.prototype = {
+          constructor: Friend,
+          prepareBackground: function(resources){
+          this.background = new PIXI.Sprite(resources["images/0.png"].texture);
+          app.stage.addChild(this.background);
+          }
         }
 
         inheritPrototype(Friend, PIXI.Sprite);
+
+
 
         function Game() {
             this.availableFriends = [];
@@ -69,68 +114,22 @@
 
         };
 
+
         Game.prototype = {
             constructor: Game,
             initGameFriends: function(resources) {
+
                 var xPos = this.marginLeft + 50;
                 var yPos = this.marginTop + 200;
-                    this.availableFriendsName = ["", "ben10", "dora", "micki mouse", "chotta bheem", "tom"];
+                this.availableFriendsName = ["", "ben10", "dora", "micki mouse", "chotta bheem", "tom"];
 
                 for (var i = 1; i < 6; i++) {
-                    this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i]);
-                    this.availableFriends[i].position.set(xPos, yPos);
-                    this.availableFriends[i].scale.set(0.2, 0.2);
-                    this.availableFriends[i].name.position.set(xPos, yPos + 150);
+                    this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i], xPos);
                     xPos += 150;
-
-                    this.availableFriends[i].generateInteraction = function()
-                    {
-
-                        this.circle.alpha = 1;
-                        this.circle.position.set(xPos,yPos);
-                        app.stage.addChild(this.circle);
-                    }
-
-                    this.availableFriends[i].deleteInteraction = function()
-                    {
-                        this.circle.alpha = 0;
-                        app.stage.addChild(this.circle);
-                    }
                 }
 
-            },
-
-            prepareBackground: function(background) {
-
-                var hXpos = this.marginLeft + 50;
-                var hYpos = this.marginTop + 50;
-                this.background = new PIXI.Sprite(background.texture);
-                this.background.position.set(this.marginLeft, this.marginTop);
-                this.heading = new PIXI.Text("Who is your friend?", {
-                    fontFamily: "Bangers",
-                    fontSize: 52,
-                    fill: "orange"
-                });
-                this.heading.position.set(hXpos, hYpos);
-            },
-
-            displayFriends: function() {
-                for (var i = 1; i < 6; i++) {
-                    app.stage.addChild(this.availableFriends[i]);
-
-                    app.stage.addChild(this.availableFriends[i].name);
-
-                }
-
-            },
-
-
-            prepareStage: function() {
-                app.stage.addChild(this.background);
-                app.stage.addChild(this.heading);
-                this.displayFriends();
-                friendIntro.stage.addChild(this.background1);
             }
+
         }
 
 
@@ -139,13 +138,15 @@
             .add('images/3.png')
             .add('images/4.png')
             .add('images/5.png')
+            .add("images/background.png")
             .add('images/0.png').load(function(loader, resources) {
 
                 var game = new Game();
                 game.initGameFriends(resources);
-                game.prepareBackground(resources["images/0.png"]);
-                game.prepareStage();
-       });
+                var friendObject = new Friend();
+                friendObject.prepareBackground(resources);
+
+            });
     </script>
 </body>
 
