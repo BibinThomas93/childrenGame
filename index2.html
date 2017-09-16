@@ -24,7 +24,9 @@
 
 
         function Friend(texture, name, xPos) {
+
             friendCntr = new PIXI.Container();
+            avatarCntr = new PIXI.Container();
             this.marginLeft = (window.innerWidth - 800) / 2;
             this.marginTop = (window.innerHeight - 500) / 2;
             yPos = this.marginTop + 200;
@@ -46,33 +48,34 @@
             this.circle.beginFill(0xE66D22, 1);
             this.circle.drawCircle(60, 60, 50);
             this.circle.endFill();
-            this.circle.alpha = 0;
+            this.circleTexture = this.circle.generateTexture();
+            this.circleSprite = new PIXI.Sprite(this.circleTexture);
+            this.circleSprit.alpha = 0;
 
             this.position.set(xPos, yPos);
             this.scale.set(0.2, 0.2);
             this.name.position.set(xPos, yPos + 150);
-            // app.stage.addChild(this);
+
             // this
             //     .on('pointerover', generateInteraction)
             //     .on('mouseout', deleteInteraction)
 
-            friendCntr.addChild(this.circle);
-            friendCntr.addChild(this);
-            friendCntr.addChild(this.name);
-
+            avatarCntr.addChild(this.circleSprit);
+            avatarCntr.addChild(this);
+            avatarCntr.addChild(this.name);
+            friendCntr.addChild(avatarCntr);
             app.stage.addChild(friendCntr);
 
-
             this.generateInteraction = function() {
-                this.circle.alpha = 1;
-                this.circle.position.set(xPos, yPos);
+                this.circleSprit.alpha = 1;
+                this.circleSprit.position.set(xPos, yPos);
                 this.scale.set(.25);
                 console.log(this);
 
             }
 
             this.deleteInteraction = function() {
-                this.circle.alpha = 0;
+                this.circleSprit.alpha = 0;
                 this.scale.set(.2);
 
             }
@@ -92,19 +95,37 @@
             //
             //   }
 
+            this.prepareBackground = function(resources){
+
+              this.heading = new PIXI.Text("Who is your friend?", {
+                  fontFamily: "Bangers",
+                  fontSize: 56,
+                  fill: "orange"
+              });
+
+
+              this.background = new PIXI.Sprite(resources["images/0.png"].texture);
+              this.background.position.set(this.marginLeft,this.marginTop);
+              this.heading.position.set(this.marginLeft+40,this.marginTop+70);
+              friendCntr.addChild(this.background);
+              friendCntr.addChild(this.heading);
+              // app.stage.addChild(friendCntr);
+
+            }
+
         };
 
-        Friend.prototype = {
-          constructor: Friend,
-          prepareBackground: function(resources){
-          this.background = new PIXI.Sprite(resources["images/0.png"].texture);
-          app.stage.addChild(this.background);
-          }
-        }
+        // Friend.prototype = {
+        //   constructor: Friend,
+        //   prepareBackground: function(resources){
+        //
+        //   this.background = new PIXI.Sprite(resources["images/0.png"].texture);
+        //   app.stage.addChild(this.background);
+        //
+        //   }
+        // }
 
         inheritPrototype(Friend, PIXI.Sprite);
-
-
 
         function Game() {
             this.availableFriends = [];
@@ -138,13 +159,13 @@
             .add('images/3.png')
             .add('images/4.png')
             .add('images/5.png')
-            .add("images/background.png")
             .add('images/0.png').load(function(loader, resources) {
+
+                var friendObj = new Friend();
+                friendObj.prepareBackground(resources);
 
                 var game = new Game();
                 game.initGameFriends(resources);
-                var friendObject = new Friend();
-                friendObject.prepareBackground(resources);
 
             });
     </script>
