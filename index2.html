@@ -7,6 +7,10 @@
     <link href='https://fonts.googleapis.com/css?family=Bangers' rel='stylesheet'>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
+    <script src="game.js"></script>
+    <script src="level1.js"></script>
+    <script src="friendReaction.js"></script>
+
 </head>
 
 <body>
@@ -14,7 +18,6 @@
         var app = new PIXI.Application(window.innerWidth, window.innerHeight);
 
         document.body.appendChild(app.view);
-
 
         function inheritPrototype(childObject, parentObject) {
             var copyOfParent = Object.create(parentObject.prototype);
@@ -27,8 +30,8 @@
 
             friendCntr = new PIXI.Container();
             avatarCntr = new PIXI.Container();
-            this.marginLeft = (window.innerWidth - 800) / 2;
-            this.marginTop = (window.innerHeight - 500) / 2;
+            Game.call(this);
+
             yPos = this.marginTop + 200;
 
             PIXI.Sprite.call(this, texture);
@@ -43,131 +46,259 @@
             this.buttonMode = true;
             this.accessible = true;
 
-            this.circle = new PIXI.Graphics();
-            this.circle.lineStyle(3, 0xFFFFFF, 1);
-            this.circle.beginFill(0xE66D22, 1);
-            this.circle.drawCircle(60, 60, 50);
-            this.circle.endFill();
-            this.circleTexture = this.circle.generateTexture();
-            this.circleSprite = new PIXI.Sprite(this.circleTexture);
-            this.circleSprit.alpha = 0;
+            this.orangeCircle = new PIXI.Graphics();
+            this.orangeCircle.lineStyle(3, 0xFFFFFF, 1);
+            this.orangeCircle.beginFill(0xE66D22, 1);
+            this.orangeCircle.drawCircle(60, 60, 50);
+            this.orangeCircle.endFill();
+            this.orangeCircleTexture = this.orangeCircle.generateTexture();
+            this.orangeCircleSprite = new PIXI.Sprite(this.orangeCircleTexture);
+            this.orangeCircleSprite.alpha = 0;
 
-            this.position.set(xPos, yPos);
+            this.anchor.set(.5, .5);
+            this.position.set(xPos + 50, yPos + 60);
             this.scale.set(0.2, 0.2);
             this.name.position.set(xPos, yPos + 150);
 
-            // this
-            //     .on('pointerover', generateInteraction)
-            //     .on('mouseout', deleteInteraction)
+            this
+                .on('pointerover', generateInteraction)
+                .on('pointerout', deleteInteraction)
 
-            avatarCntr.addChild(this.circleSprit);
+
+            avatarCntr.addChild(this.orangeCircleSprite);
             avatarCntr.addChild(this);
             avatarCntr.addChild(this.name);
             friendCntr.addChild(avatarCntr);
             app.stage.addChild(friendCntr);
 
-            this.generateInteraction = function() {
-                this.circleSprit.alpha = 1;
-                this.circleSprit.position.set(xPos, yPos);
+            function generateInteraction() {
+
+                this.orangeCircleSprite.alpha = 1;
+                this.orangeCircleSprite.anchor.set(.5, .5);
+                this.orangeCircleSprite.position.set(xPos + 50, yPos + 60);
                 this.scale.set(.25);
-                console.log(this);
 
             }
 
-            this.deleteInteraction = function() {
-                this.circleSprit.alpha = 0;
+            function deleteInteraction() {
+
+                this.orangeCircleSprite.alpha = 0;
                 this.scale.set(.2);
 
             }
 
-            this.mouseover = function(mouseData) {
-                this.generateInteraction();
+            this.prepareBackground = function(resources) {
 
+                this.background.position.set(this.marginLeft, this.marginTop);
+                this.heading.position.set(this.marginLeft + 40, this.marginTop + 70);
+                friendCntr.addChild(this.background);
+                friendCntr.addChild(this.heading);
+                spriteGap = 100;
+                for (var i = 1; i < 6; i++) {
+                    this.circle = new PIXI.Graphics();
+                    this.circle.lineStyle(3, 0xFFFFFF, 1);
+                    this.circle.beginFill(0xFFC62A, 1);
+                    this.circle.drawCircle(60, 60, 50);
+                    this.circle.endFill();
+                    this.circleTexture = this.circle.generateTexture();
+                    this.circleSprite = new PIXI.Sprite(this.circleTexture);
+                    this.circleSprite.anchor.set(.5, .5);
+                    this.circleSprite.position.set(this.marginLeft + spriteGap, yPos + 60);
+                    this.circleSprite.alpha = 1;
+                    friendCntr.addChild(this.circleSprite);
+                    spriteGap += 150;
+                }
             }
-            this.mouseout = function(mouseData) {
-                this.deleteInteraction();
-
-            }
-
-            // this.click = function(){
-            //     app.stage.visible = false;
-            //     this.prepareFriendIntroStage();
-            //
-            //   }
-
-            this.prepareBackground = function(resources){
-
-              this.heading = new PIXI.Text("Who is your friend?", {
-                  fontFamily: "Bangers",
-                  fontSize: 56,
-                  fill: "orange"
-              });
 
 
-              this.background = new PIXI.Sprite(resources["images/0.png"].texture);
-              this.background.position.set(this.marginLeft,this.marginTop);
-              this.heading.position.set(this.marginLeft+40,this.marginTop+70);
-              friendCntr.addChild(this.background);
-              friendCntr.addChild(this.heading);
-              // app.stage.addChild(friendCntr);
+            this.click = function() {
+
+                self = this;
+                var introObj = new FriendIntroduction();
+                introObj.prepareStage(self);
+                introObj.interAction();
+                introObj.displayStage();
 
             }
 
         };
-
-        // Friend.prototype = {
-        //   constructor: Friend,
-        //   prepareBackground: function(resources){
-        //
-        //   this.background = new PIXI.Sprite(resources["images/0.png"].texture);
-        //   app.stage.addChild(this.background);
-        //
-        //   }
-        // }
 
         inheritPrototype(Friend, PIXI.Sprite);
 
-        function Game() {
-            this.availableFriends = [];
-            this.windowWidth = window.innerWidth;
-            this.marginLeft = (window.innerWidth - 800) / 2;
-            this.marginTop = (window.innerHeight - 500) / 2;
+        function FriendIntroduction() {
+
+            friendInroCntr = new PIXI.Container();
+
+            Game.call(this);
+
 
         };
 
 
-        Game.prototype = {
-            constructor: Game,
-            initGameFriends: function(resources) {
+        FriendIntroduction.prototype = {
 
-                var xPos = this.marginLeft + 50;
-                var yPos = this.marginTop + 200;
-                this.availableFriendsName = ["", "ben10", "dora", "micki mouse", "chotta bheem", "tom"];
+            constructor: FriendIntroduction,
+            prepareStage: function(self) {
 
-                for (var i = 1; i < 6; i++) {
-                    this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i], xPos);
-                    xPos += 150;
+                self
+                    .on('pointerover', friendInteraction)
+                    .on('pointerout', friendInteractionOut)
+
+                function friendInteraction() {
+
+                    self.scale.set(.5);
+                    self.name.scale.set(1.2);
+
                 }
+
+                function friendInteractionOut() {
+                    self.scale.set(.5);
+                    self.name.scale.set(1.2);
+                }
+
+                self.scale.set(.5);
+                self.name.scale.set(1.2);
+                self.position.set(this.marginLeft - 50, this.marginTop + 200);
+                self.name.position.set(this.marginLeft + 50, this.marginTop + 350);
+                friendInroCntr.position.set(this.marginLeft, this.marginTop);
+
+            },
+
+
+            interAction: function() {
+
+                this.yellowArrow.position.set(this.marginLeft + 300, this.marginTop + 150);
+                this.yellowArrow.interactive = true;
+                this.yellowArrow.accessible = true;
+                this.yellowArrow.buttonMode = true;
+
+                this.yellowArrow
+                    .on('pointerover', arrowInteraction)
+                    .on('pointerout', arrowInteractionOut)
+
+                var parent = this;
+                function arrowInteraction() {
+
+                    parent.orangeArrow.visible = true;
+                    parent.dialogueText.visible = true;
+                    parent.dialogueBox.visible = true;
+                    parent.orangeArrow.position.set(parent.marginLeft+300, parent.marginTop+150);
+                    parent.dialogueText.position.set(parent.marginLeft+70, parent.marginTop+40);
+                    parent.dialogueBox.position.set(parent.marginLeft, parent.marginTop);
+
+                    display();
+
+                }
+
+                function arrowInteractionOut() {
+
+                    parent.orangeArrow.visible = false;
+                    parent.dialogueBox.visible = false;
+                    parent.dialogueText.visible = false;
+
+                }
+
+                function display(){
+                  friendInroCntr.addChild(parent.orangeArrow);
+                  friendInroCntr.addChild(parent.dialogueBox);
+                  friendInroCntr.addChild(parent.dialogueText);
+                }
+
+                this.yellowArrow.click = function() {
+
+                    friendInroCntr.visible = false;
+                    levelObj = new GameLevels();
+                    levelObj.prepareLevelsBackground();
+                    levelObj.InteractLevelObject();
+                    levelObj.displayLevels();
+                }
+
+            },
+
+            displayStage: function() {
+
+                friendInroCntr.addChild(this.background1);
+                friendInroCntr.addChild(self);
+                friendInroCntr.addChild(self.name);
+                friendInroCntr.addChild(this.yellowArrow);
+                app.stage.addChild(friendInroCntr);
 
             }
 
         }
 
 
-        PIXI.loader.add('images/1.png')
-            .add('images/2.png')
-            .add('images/3.png')
-            .add('images/4.png')
-            .add('images/5.png')
-            .add('images/0.png').load(function(loader, resources) {
+        function GameLevels() {
+            Game.call(this);
+            levelsStageCtr = new PIXI.Container();
+         };
 
-                var friendObj = new Friend();
-                friendObj.prepareBackground(resources);
+        GameLevels.prototype = {
+            constructor: GameLevels,
+            prepareLevelsBackground: function() {
 
-                var game = new Game();
-                game.initGameFriends(resources);
+                this.levelsBg.position.set(this.marginLeft, this.marginTop);
 
-            });
+            },
+
+            InteractLevelObject: function() {
+
+                this.pigSprite.position.set(this.marginLeft + 178, this.marginTop + 175);
+
+                this.pigSprite.interactive = true;
+                this.pigSprite.buttonMode = true;
+                this.pigSprite.accessible = true;
+
+                this.pigSprite
+                  .on('pointerover', levelObjInteraction)
+                  .on('pointerout', levelObjInteractionOut)
+
+                var inside = this;
+                function levelObjInteraction(){
+
+                    inside.pigSprite.x = inside.marginLeft+215;
+                    inside.pigSprite.y = inside.marginTop+205;
+                    inside.pigSprite.anchor.x = 0.5;
+                    inside.pigSprite.anchor.y = 0.5;
+
+                    for(var i=0;i<30;i++)
+                    {
+
+                      inside.pigSprite.rotation += 0.01;
+
+                     }
+                 }
+
+                function levelObjInteractionOut(){
+
+                     inside.pigSprite.rotation = 0;
+
+                  }
+
+                this.pigSprite.click = function(){
+
+                  levelsStageCtr.visible = false;
+                  var playObj = new StartPlay();
+                  playObj.playArea();
+                  playObj.diasplayPlayArea();
+                  playObj.pigInitialPosition();
+                  playObj.calculation();
+                  playObj.pigChangedPosition();
+
+                }
+
+            },
+
+            displayLevels: function() {
+
+                levelsStageCtr.addChild(this.levelsBg);
+                levelsStageCtr.addChild(this.pigSprite);
+                app.stage.addChild(levelsStageCtr);
+
+            }
+
+        }
+
     </script>
 </body>
 
