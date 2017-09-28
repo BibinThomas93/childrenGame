@@ -4,12 +4,7 @@ function StartPlay() {
     pigCtr = new PIXI.Container();
     this.myarray = [];
 
-// get: function(){
-//
-// }
-// set: function(){
-//
-// }
+
 
 };
 
