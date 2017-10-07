@@ -6,6 +6,8 @@ function Game() {
     this.levelsStageCtr = new PIXI.Container();
     this.reactionCtr = new PIXI.Container();
     this.gameOverCtr = new PIXI.Container();
+    this.instructionCtr = new PIXI.Container();
+    this.friendCntr = new PIXI.Container();
     this.graphics = new PIXI.Graphics();
 
     this.myarray = [];
@@ -19,12 +21,12 @@ function Game() {
     this.marginLeft = (window.innerWidth - 800) / 2;
     this.marginTop = (window.innerHeight - 500) / 2;
 
-    this.heading = new PIXI.Text("Who is your friend?", {
-        fontFamily: "Bangers",
-        fontSize: 56,
-        fill: "orange"
-    });
+    this.heading = new PIXI.Text("ആരാണ് നിന്റെ ചങ്ങാതി?", {
 
+        fill: "orange",
+        font: "bold 56px Chilanka",
+    });
+    this.heading.width = 600;
 
     this.bg = PIXI.Texture.fromImage('images/0.png');
     this.background = new PIXI.Sprite(this.bg);
@@ -38,8 +40,8 @@ function Game() {
     this.texturebox = PIXI.Texture.fromImage('images/dialogue.png');
     this.dialogueBox = new PIXI.Sprite(this.texturebox);
 
-    this.dialogueText = new PIXI.Text("let's go", {
-        fontFamily: "Bangers",
+    this.dialogueText = new PIXI.Text("കളി തുടങ്ങാം!", {
+        fontFamily: "Chilanka",
         fontSize: 26,
         fill: "white"
     });
@@ -53,6 +55,17 @@ function Game() {
 
     this.texturePig = PIXI.Texture.fromImage('images/pig.png');
     this.pigSprite = new PIXI.Sprite(this.texturePig);
+
+
+    this.texturePointer = PIXI.Texture.fromImage('images/pointing_hand.png');
+    this.handPointerSprite = new PIXI.Sprite(this.texturePointer);
+
+    this.textureInstructionBg = PIXI.Texture.fromImage('images/stage1/instructionBg.png');
+    this.InstructionBgSprite = new PIXI.Sprite(this.textureInstructionBg);
+
+    this.texturePicBase = PIXI.Texture.fromImage('images/stage1/picBase.png');
+    this.picBaseSprite = new PIXI.Sprite(this.texturePicBase);
+
 
     this.texturePlayArea = PIXI.Texture.fromImage('images/bg.png');
     this.playAreaSprite = new PIXI.Sprite(this.texturePlayArea);
@@ -92,6 +105,19 @@ function Game() {
     this.textureTomSad = PIXI.Texture.fromImage('images/5_sad.png');
     this.TomSadSprite = new PIXI.Sprite(this.textureTomSad);
 
+    this.textureTomGameOver = PIXI.Texture.fromImage('images/gameOver_tom.png');
+    this.TomGameOverSprite = new PIXI.Sprite(this.textureTomGameOver);
+    this.textureBen10GameOver = PIXI.Texture.fromImage('images/gameOver_ben10.png');
+    this.Ben10GameOverSprite = new PIXI.Sprite(this.textureBen10GameOver);
+    this.textureChottaGameOver = PIXI.Texture.fromImage('images/gameOver_chotta.png');
+    this.ChottaGameOverSprite = new PIXI.Sprite(this.textureChottaGameOver);
+    this.textureMickiGameOver = PIXI.Texture.fromImage('images/gameOver_micki.png');
+    this.MickiGameOverSprite = new PIXI.Sprite(this.textureMickiGameOver);
+    this.textureDoraGameOver = PIXI.Texture.fromImage('images/gameOver_dora.png');
+    this.DoraGameOverSprite = new PIXI.Sprite(this.textureDoraGameOver);
+
+    this.textureStars = PIXI.Texture.fromImage('images/stars.png');
+    this.StarsSprite = new PIXI.Sprite(this.textureStars);
 
 };
 
@@ -102,7 +128,7 @@ Game.prototype = {
 
         var xPos = this.marginLeft + 50;
         var yPos = this.marginTop + 200;
-        this.availableFriendsName = ["", "ben10", "dora", "micki mouse", "chotta bheem", "tom"];
+        this.availableFriendsName = ["", "ബെൻ10", "ഡോറ ", "മിക്കിമൗസ് ", "ചോട്ടാഭീം ", "ടോം "];
 
         for (var i = 1; i < 6; i++) {
             this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i], xPos);
@@ -120,13 +146,16 @@ Game.prototype = {
         function friendInteraction() {
 
             self.scale.set(.5);
-            self.name.scale.set(1.2);
+            self.name.scale.set(1.25);
+            self.name.position.set(this.marginLeft + 100, this.marginTop + 330);
 
         }
 
         function friendInteractionOut() {
             self.scale.set(.5);
-            self.name.scale.set(1.2);
+            self.name.scale.set(1.25);
+            self.name.position.set(this.marginLeft + 100, this.marginTop + 330);
+
         }
 
         self.scale.set(.5);
@@ -138,7 +167,7 @@ Game.prototype = {
     },
 
 
-   interAction: function() {
+    interAction: function() {
 
         this.yellowArrow.position.set(this.marginLeft + 300, this.marginTop + 150);
         this.yellowArrow.interactive = true;
@@ -150,13 +179,16 @@ Game.prototype = {
             .on('pointerout', arrowInteractionOut)
 
         var parent = this;
+
         function arrowInteraction() {
 
+            parent.yellowArrow.alpha = 0;
             parent.orangeArrow.visible = true;
             parent.dialogueText.visible = true;
             parent.dialogueBox.visible = true;
-            parent.orangeArrow.position.set(parent.marginLeft+300, parent.marginTop+150);
-            parent.dialogueText.position.set(parent.marginLeft+70, parent.marginTop+40);
+
+            parent.orangeArrow.position.set(parent.marginLeft + 310, parent.marginTop + 150);
+            parent.dialogueText.position.set(parent.marginLeft + 40, parent.marginTop + 35);
             parent.dialogueBox.position.set(parent.marginLeft, parent.marginTop);
 
             display();
@@ -164,31 +196,31 @@ Game.prototype = {
         }
 
         function arrowInteractionOut() {
-
+            parent.yellowArrow.alpha = 1;
             parent.orangeArrow.visible = false;
             parent.dialogueBox.visible = false;
             parent.dialogueText.visible = false;
+            parent.yellowArrow.alpha = 1;
 
         }
 
-        function display(){
-          parent.friendInroCntr.addChild(parent.orangeArrow);
-          parent.friendInroCntr.addChild(parent.dialogueBox);
-          parent.friendInroCntr.addChild(parent.dialogueText);
+        function display() {
+            parent.friendInroCntr.addChild(parent.orangeArrow);
+            parent.friendInroCntr.addChild(parent.dialogueBox);
+            parent.friendInroCntr.addChild(parent.dialogueText);
         }
 
         this.yellowArrow.click = function() {
 
-           parent.friendInroCntr.visible = false;
+            parent.friendInroCntr.visible = false;
 
-           parent.prepareLevelsBackground();
-           parent.InteractLevelObject();
-           parent.displayLevels();
+            parent.prepareLevelsBackground();
+
         }
 
     },
 
-    displayStage: function () {
+    displayStage: function() {
 
         this.friendInroCntr.addChild(this.background1);
         this.friendInroCntr.addChild(self);
@@ -198,13 +230,25 @@ Game.prototype = {
 
     },
 
-    prepareLevelsBackground: function() {
 
+    prepareLevelsBackground: function(l) {
+
+        this.StarsSprite.visible = false;
         this.levelsBg.position.set(this.marginLeft, this.marginTop);
+        this.StarsSprite.position.set(this.marginLeft + 160, this.marginTop + 225);
+
+        if (l == 1) {
+
+            this.StarsSprite.visible = true;
+            this.levelsStageCtr.visible = true;
+        }
+
+        this.InteractLevelObject();
 
     },
 
     InteractLevelObject: function() {
+
 
         this.pigSprite.position.set(this.marginLeft + 178, this.marginTop + 175);
 
@@ -213,70 +257,286 @@ Game.prototype = {
         this.pigSprite.accessible = true;
 
         this.pigSprite
-          .on('pointerover', levelObjInteraction)
-          .on('pointerout', levelObjInteractionOut)
+            .on('pointerover', levelObjInteraction)
+            .on('pointerout', levelObjInteractionOut)
 
         var inside = this;
-        function levelObjInteraction(){
 
-            inside.pigSprite.x = inside.marginLeft+215;
-            inside.pigSprite.y = inside.marginTop+205;
+        function levelObjInteraction() {
+
+            inside.pigSprite.x = inside.marginLeft + 215;
+            inside.pigSprite.y = inside.marginTop + 205;
             inside.pigSprite.anchor.x = 0.5;
             inside.pigSprite.anchor.y = 0.5;
+            // inside.pigSprite.rotation += 0;
 
-            for(var i=0;i<30;i++)
+            for(var i=0;i<60;i++)
             {
-
               inside.pigSprite.rotation += 0.01;
+            }
 
-             }
-         }
+            // inside.levelsStageCtr.ticker.add(function() {
+            //
+            //
+            //     inside.pigSprite.clear();
+            //
+            //     inside.pigSprite.rotation += 1;
+            //
+            // });
 
-        function levelObjInteractionOut(){
+        }
 
-             inside.pigSprite.rotation = 0;
+        function levelObjInteractionOut() {
 
-          }
+            for(var i=0;i<60;i++)
+            {
+              inside.pigSprite.rotation -= 0.01;
+            }
+            // animate1();
+            // function animate1() {
+            //         inside.pigSprite.rotation -= .1;
+            //         requestAnimationFrame(animate1);
+            //     }
 
-        this.pigSprite.click = function(){
 
-          inside.levelsStageCtr.visible = false;
-          // var playObj = new StartPlay();
-          inside.playArea();
-          inside.diasplayPlayArea();
-          inside.pigInitialPosition();
-          inside.calculation();
-          inside.pigChangedPosition();
+
+        }
+
+        this.pigSprite.click = function() {
+
+            inside.levelsStageCtr.visible = false;
+
+            inside.instructionVideo();
+        }
+        this.displayLevels();
+
+    },
+
+
+    instructionVideo: function() {
+
+        this.pressText = new PIXI.Text("ബട്ടൺ അമർത്തുക ", {
+            font: "bold 26px Chilanka",
+            fill: "orange"
+        });
+
+        sW = this.marginLeft + this.marginLeft / 2;
+
+        sH = (this.marginTop) *4;
+
+        this.InstructionBgSprite.position.set(this.marginLeft, this.marginTop);
+
+        parent = this;
+        firstInstruction();
+
+
+        function firstInstruction() {
+
+            this.insrtuction1Ctr = new PIXI.Container();
+
+            tickTexture = PIXI.Texture.fromImage('images/tick.png');
+            tickPic = new PIXI.Sprite(tickTexture);
+
+            parent.instructionText1 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ ഒരേ ദിശയിൽ ആണെങ്കിൽ", {
+                font: "bold 26px Chilanka",
+                fill: "orange"
+            });
+
+            parent.pressText.anchor.set(.5, .5);
+            parent.pressText.position.set(parent.marginLeft + 400, parent.marginTop + 100);
+
+            parent.instructionText1.anchor.set(.5, .5);
+            parent.instructionText1.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+
+            tickPic.anchor.set(.5, .5);
+            tickPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
+            tickPic.scale.set(.4,.4);
+
+            parent.handPointerSprite.position.set(sH + 370, sH + 270);
+            parent.handPointerSprite.scale.set(.45, .45);
+
+
+            displayInstruction1();
+            parent.pigInitialPosition();
+            parent.playArea();
+            parent.displayPlayArea();
+            parent.dispalyPigs();
+            parent.pig_lSprite.position.set(sW+162, sH+60);
+            parent.pig_lSprite.scale.set(.7,.7);
+            parent.pig_rSprite.position.set(sW+320, sH+60);
+            parent.pig_rSprite.scale.set(.7,.7);
+            parent.PlayAreaCtr.scale.set(.6,.6);
+            parent.PlayAreaCtr.position.set(sW, sH-50);
+
+
+            function displayInstruction1(){
+
+              this.insrtuction1Ctr.addChild(parent.InstructionBgSprite);
+              // insrtuction1Ctr.addChild(parent.handPointerSprite);
+              this.insrtuction1Ctr.addChild(parent.pressText);
+              this.insrtuction1Ctr.addChild(tickPic);
+
+              parent.instructionCtr.addChild(this.insrtuction1Ctr);
+              parent.instructionCtr.addChild(parent.instructionText1);
+
+              app.stage.addChild(parent.instructionCtr);
+              setTimeout(nextInstruction, 4000);
+            }
+
+
+
+            function nextInstruction(){
+
+            nextInstructionText = new PIXI.Text("ചിത്രങ്ങൾ ഒരേ ദിശയിൽ  വ്യത്യസ്ത ക്രമീകരണത്തിൽ ആണെങ്കിൽ ", {
+                font: "bold 26px Chilanka",
+                fill: "orange"
+            });
+            nextInstructionText.anchor.set(.5, .5);
+            nextInstructionText.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+
+            parent.pig_lSprite.rotation= 1.5;
+            parent.pig_rSprite.rotation= .5;
+            parent.instructionText1.visible = false;
+
+            this.insrtuction1Ctr.addChild(nextInstructionText);
+
+            }
+
+            setTimeout(invisible, 8000);
+
+            function invisible() {
+                this.insrtuction1Ctr.visible = false;
+                secondInstruction();
+            }
+
+
+        }
+
+        function secondInstruction() {
+
+
+            insrtuction2Ctr = new PIXI.Container();
+
+            parent.instructionText2 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ ഒരേ ദിശയിൽ അല്ലങ്കിൽ", {
+                font: "bold 26px Chilanka",
+                fill: "orange"
+            });
+
+            crossTexture = PIXI.Texture.fromImage('images/cross.png');
+            crossPic = new PIXI.Sprite(crossTexture);
+
+            parent.pressText.anchor.set(.5, .5);
+            parent.pressText.position.set(parent.marginLeft + 400, parent.marginTop + 100);
+
+            parent.instructionText2.anchor.set(.5, .5);
+            parent.instructionText2.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+
+            parent.handPointerSprite.scale.x = -.5;
+            parent.handPointerSprite.position.set(sH + 700, sH + 270);
+
+            crossPic.anchor.set(.5, .5);
+            crossPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
+            crossPic.scale.set(.4,.4);
+
+
+            displayInstruction2();
+            parent.pigInitialPosition();
+            parent.playArea();
+            parent.displayPlayArea();
+            parent.dispalyPigs();
+            parent.pig_lSprite.position.set(sW+162, sH+60);
+            parent.pig_lSprite.scale.set(.7,.7);
+            parent.pig_rSprite.position.set(sW+320, sH+60);
+            parent.pig_rSprite.scale.set(.7,.7);
+            parent.PlayAreaCtr.scale.set(.6,.6);
+            parent.PlayAreaCtr.position.set(sW, sH-50);
+
+            setTimeout(invisible, 4000);
+
+            function invisible() {
+                insrtuction2Ctr.visible = false;
+            }
+
+              function displayInstruction2(){
+
+                insrtuction2Ctr.addChild(parent.InstructionBgSprite);
+                // insrtuction2Ctr.addChild(parent.handPointerSprite);
+                insrtuction2Ctr.addChild(parent.pressText);
+                insrtuction2Ctr.addChild(crossPic);
+
+                parent.instructionCtr.addChild(insrtuction2Ctr);
+                parent.instructionCtr.addChild(parent.instructionText2);
+
+                app.stage.addChild(parent.instructionCtr);
+                setTimeout(nextInstruction, 4000);
+
+              }
+
+              function nextInstruction(){
+
+              nextInstructionText = new PIXI.Text("വ്യത്യസ്ത ദിശയിൽ ഒരേ ചിത്രങ്ങൾ വ്യത്യസ്ത ക്രമീകരണത്തിൽ ആണെങ്കിൽ ", {
+                  font: "bold 26px Chilanka",
+                  fill: "orange"
+              });
+              nextInstructionText.anchor.set(.5, .5);
+              nextInstructionText.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+
+              parent.pig_lSprite.rotation= 1.5;
+              parent.pig_rSprite.rotation= .5;
+              parent.instructionText1.visible = false;
+
+              this.insrtuction1Ctr.addChild(nextInstructionText);
+
+              }
+
+        }
+
+        setTimeout(invisibleTheCtnr, 14000);
+
+        parent = this;
+
+        function invisibleTheCtnr() {
+
+            parent.instructionCtr.visible = false;
+            parent.playArea();
+            parent.displayPlayArea();
+            parent.pigInitialPosition();
+            parent.calculation();
+            parent.pigChangedPosition();
 
         }
 
     },
 
+
+
     displayLevels: function() {
 
         this.levelsStageCtr.addChild(this.levelsBg);
         this.levelsStageCtr.addChild(this.pigSprite);
+        this.levelsStageCtr.addChild(this.StarsSprite);
         app.stage.addChild(this.levelsStageCtr);
 
     },
 
 
-
-
-//Start to play , In future it may changed as class
+    //Start to play , In future it may changed as class
 
 
     playArea: function() {
 
-        this.playAreaSprite.position.set(this.marginLeft, this.marginTop);
+        // this.playAreaSprite.position.set(this.marginLeft, this.marginTop);
+        this.playAreaSprite.scale.set(1, 1);
         this.tickSprite.scale.set(.6, .6);
-        this.tickSprite.position.set(this.marginLeft + 310, this.marginTop + 300);
+        this.tickSprite.position.set(this.marginLeft+30 , this.marginTop + 220);
         this.crossSprite.scale.set(.6, .6);
-        this.crossSprite.position.set(this.marginLeft + 410, this.marginTop + 300);
+        this.crossSprite.position.set(this.marginLeft + 130, this.marginTop + 220);
+        this.PlayAreaCtr.scale.set(1,1);
+        this.PlayAreaCtr.position.set(this.marginLeft, this.marginTop);
 
     },
 
-    diasplayPlayArea: function() {
+    displayPlayArea: function() {
 
         this.PlayAreaCtr.addChild(this.playAreaSprite);
         this.PlayAreaCtr.addChild(this.tickSprite);
@@ -347,44 +607,44 @@ Game.prototype = {
         }
 
 
-},
+    },
 
-pigInitialPosition: function(){
+    pigInitialPosition: function() {
 
-  this.pig_lSprite.x = this.marginLeft + 270;
-  this.pig_lSprite.y = this.marginTop + 190;
+        this.pig_lSprite.x = this.marginLeft + 270;
+        this.pig_lSprite.y = this.marginTop + 190;
 
-  this.pig_rSprite.x = this.marginLeft + 540;
-  this.pig_rSprite.y = this.marginTop + 190;
+        this.pig_rSprite.x = this.marginLeft + 540;
+        this.pig_rSprite.y = this.marginTop + 190;
 
-  this.pig_lSprite.scale.x = 1;
-  this.pig_rSprite.scale.x = 1;
-  this.pig_lSprite.rotation = 0;
-  this.pig_rSprite.rotation = 0;
-  this.pig_rSprite.anchor.set(0.5, 0.5);
-  this.pig_lSprite.anchor.set(0.5, 0.5);
+        this.pig_lSprite.scale.set(1,1);
+        this.pig_rSprite.scale.set(1,1);
+        this.pig_lSprite.rotation = 0;
+        this.pig_rSprite.rotation = 0;
+        this.pig_rSprite.anchor.set(0.5, 0.5);
+        this.pig_lSprite.anchor.set(0.5, 0.5);
 
-},
+    },
 
-pigChangedPosition:function(){
+    pigChangedPosition: function() {
 
-  this.pig_lSprite.x = this.marginLeft + 270;
-  this.pig_lSprite.y = this.marginTop + 190;
+        this.pig_lSprite.x = this.marginLeft + 270;
+        this.pig_lSprite.y = this.marginTop + 190;
 
-  this.pig_rSprite.x = this.marginLeft + 540;
-  this.pig_rSprite.y = this.marginTop + 190;
+        this.pig_rSprite.x = this.marginLeft + 540;
+        this.pig_rSprite.y = this.marginTop + 190;
 
-  this.pig_lSprite.scale.x = 1;
-  this.pig_rSprite.scale.x = 1;
-  this.pig_lSprite.rotation = 0;
-  this.pig_rSprite.rotation = 0;
-  this.pig_rSprite.anchor.set(0.5, 0.5);
-  this.pig_lSprite.anchor.set(0.5, 0.5);
+        this.pig_lSprite.scale.x = 1;
+        this.pig_rSprite.scale.x = 1;
+        this.pig_lSprite.rotation = 0;
+        this.pig_rSprite.rotation = 0;
+        this.pig_rSprite.anchor.set(0.5, 0.5);
+        this.pig_lSprite.anchor.set(0.5, 0.5);
 
-  var num = Math.floor((Math.random() * 3) + 1);
-  var lev = Math.floor((Math.random() * this.stagesNum-1) + 1);
-  var flip = this.myarray[lev][0];
-  var rotation = this.myarray[lev][1];
+        var num = Math.floor((Math.random() * 3) + 1);
+        var lev = Math.floor((Math.random() * this.stagesNum - 1) + 1);
+        var flip = this.myarray[lev][0];
+        var rotation = this.myarray[lev][1];
 
         if (num == 1) {
 
@@ -405,227 +665,211 @@ pigChangedPosition:function(){
             this.pig_rSprite.rotation = rotation;
         }
 
-  this.dispalyPigs();
-  this.initialiseReaction(num, flip);
+        this.dispalyPigs();
+        this.initialiseReaction(num, flip);
 
-},
+    },
 
-dispalyPigs: function() {
-    this.pigCtr.addChild(this.pig_rSprite);
-    this.pigCtr.addChild(this.pig_lSprite);
-    app.stage.addChild(this.pigCtr);
-},
+    dispalyPigs: function() {
+        this.pigCtr.addChild(this.pig_rSprite);
+        this.pigCtr.addChild(this.pig_lSprite);
+        app.stage.addChild(this.pigCtr);
+    },
 
 
-initialiseReaction: function(num, flip) {
+    initialiseReaction: function(num, flip) {
 
-          this.tickSprite.interactive = true;
-          this.tickSprite.buttonMode = true;
-          this.tickSprite.accessible = true;
+        this.tickSprite.interactive = true;
+        this.tickSprite.buttonMode = true;
+        this.tickSprite.accessible = true;
 
-          this.crossSprite.interactive = true;
-          this.crossSprite.buttonMode = true;
-          this.crossSprite.accessible = true;
+        this.crossSprite.interactive = true;
+        this.crossSprite.buttonMode = true;
+        this.crossSprite.accessible = true;
 
-          parent = this;
-          this.tickSprite.click = function() {
+        parent = this;
+        this.tickSprite.click = function() {
 
-        if (num == 3) {
-
-            parent.happy();
-
-        } else {
-            if (flip == 1) {
-
-                parent.happy();
-
-            }
-
-            if (flip == -1) {
+            if (num == 3) {
 
                 parent.sad();
+
+            } else {
+                if (flip == 1) {
+
+                    parent.sad();
+
+                }
+
+                if (flip == -1) {
+
+                    parent.happy();
+                }
+
             }
 
         }
 
-    }
-
-    this.crossSprite.click = function() {
+        this.crossSprite.click = function() {
 
 
-        if (num == 3) {
-          parent.happy();
-
-        } else {
-
-            if (flip == -1) {
-
+            if (num == 3) {
                 parent.happy();
 
-            }
+            } else {
 
-            if (flip == 1) {
+                if (flip == -1) {
 
-                parent.sad();
+                    parent.sad();
+
+                }
+
+                if (flip == 1) {
+
+                    parent.happy();
+                }
+
             }
+        }
+
+
+    },
+
+
+    happy: function() {
+
+        this.reactionCtr.visible = true;
+        this.happySprite.position.set(this.marginLeft, this.marginTop);
+        this.reactionCtr.addChild(this.happySprite);
+
+        app.stage.addChild(this.reactionCtr);
+
+        setTimeout(hideReactionCtr, 1300);
+
+        var callObj = this.playbj;
+        parent = this;
+
+        function hideReactionCtr() {
+
+            parent.reactionCtr.visible = false;
+            parent.pigChangedPosition();
+
+            setTimeout(function() {
+                parent.progressBar(parent.pBWidth);
+            }, 100)
+        }
+
+    },
+
+    sad: function() {
+
+        this.reactionCtr.visible = true;
+        this.sadSprite.position.set(this.marginLeft, this.marginTop);
+        this.reactionCtr.addChild(this.sadSprite);
+        app.stage.addChild(this.reactionCtr);
+
+
+        setTimeout(hideReactionCtr, 1300);
+        parent = this;
+
+        function hideReactionCtr() {
+
+            parent.reactionCtr.visible = false;
+            parent.pigChangedPosition();
 
         }
-    }
+
+    },
+
+    selectAllSpritesOfFriend: function() {
+        var compare = self._texture.textureCacheIds
+
+        if (compare == "images/1.png") {
+            this.happySprite = this.Ben10HappySprite;
+            this.sadSprite = this.Ben10SadSprite;
+            this.gameOverSprite = this.Ben10GameOverSprite;
+
+        }
+
+        if (compare == "images/2.png") {
 
 
-},
+            this.happySprite = this.DoraHappySprite;
+            this.sadSprite = this.DoraSadSprite;
+            this.gameOverSprite = this.DoraGameOverSprite;
+        }
 
+        if (compare == "images/3.png") {
 
-happy: function(){
+            this.happySprite = this.MickiHappySprite;
+            this.sadSprite = this.MickiSadSprite;
+            this.gameOverSprite = this.MickiGameOverSprite;
+        }
 
-  this.reactionCtr.visible = true;
-  var compare = self._texture.textureCacheIds;
-  if( compare == "images/1.png")
-    {
-      this.Ben10HappySprite.position.set(this.marginLeft, this.marginTop);
-      this.reactionCtr.addChild(this.Ben10HappySprite);
+        if (compare == "images/4.png") {
 
-    }
+            this.happySprite = this.ChottaHappySprite;
+            this.sadSprite = this.ChottaSadSprite;
+            this.gameOverSprite = this.ChottaGameOverSprite;
 
-    if( compare == "images/2.png")
-      {
+        }
 
-        this.DoraHappySprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.DoraHappySprite);
+        if (compare == "images/5.png") {
 
-      }
+            this.happySprite = this.TomHappySprite;
+            this.sadSprite = this.TomSadSprite;
+            this.gameOverSprite = this.TomGameOverSprite;
 
-    if( compare == "images/3.png")
-      {
+        }
 
-        this.MickiHappySprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.MickiHappySprite);
+    },
 
-      }
+    progressBar: function(x) {
 
-    if( compare == "images/4.png")
-      {
+        this.pBcurrentW += x;
 
-        this.ChottaHappySprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.ChottaHappySprite);
+        if (this.pBcurrentW == 500) {
+            this.gameOver();
+            this.PlayAreaCtr.visible = false;
+            this.pigCtr.visible = false;
+        } else {
+            this.graphics.beginFill(0xe68a00); // Dark blue gray 'ish
+            // Draw a rectangle with rounded corners
+            this.graphics.drawRoundedRect(this.marginLeft-131 , this.marginTop + 396, this.pBcurrentW, 15, 8); // drawRoundedRect(x, y, width, height, radius)
+            this.graphics.endFill();
+            this.PlayAreaCtr.addChild(this.graphics);
 
-      }
+        }
+    },
 
-    if( compare == "images/5.png")
-      {
+    gameOver: function() {
 
-        this.TomHappySprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.TomHappySprite);
-
-      }
-
-  app.stage.addChild(this.reactionCtr);
-
-  setTimeout(hideReactionCtr, 1300);
-
-  var callObj = this.playbj;
-  parent = this;
-
-  function hideReactionCtr(){
-
-    parent.reactionCtr.visible = false;
-
-    setTimeout(function() {
-        parent.progressBar(parent.pBWidth);
-    },100)
-  }
-
-},
-
-sad: function(){
-  var compare = self._texture.textureCacheIds
-  this.reactionCtr.visible = true;
-  if( compare == "images/1.png")
-    {
-      this.Ben10SadSprite.position.set(this.marginLeft, this.marginTop);
-      this.reactionCtr.addChild(this.Ben10SadSprite);
-
-    }
-
-    if( compare == "images/2.png")
-      {
-
-        this.DoraSadSprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.DoraSadSprite);
-
-      }
-
-    if( compare == "images/3.png")
-      {
-
-        this.MickiSadSprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.MickiSadSprite);
-
-      }
-
-    if( compare == "images/4.png")
-      {
-
-        this.ChottaSadSprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.ChottaSadSprite);
-
-      }
-
-    if( compare == "images/5.png")
-      {
-
-        this.TomSadSprite.position.set(this.marginLeft, this.marginTop);
-        this.reactionCtr.addChild(this.TomSadSprite);
-
-      }
-
-  app.stage.addChild(this.reactionCtr);
-  setTimeout(hideReactionCtr, 1300);
-
-  parent = this;
-  function hideReactionCtr(){
-
-    parent.reactionCtr.visible = false;
-    parent.pigChangedPosition();
-
-  }
-
-},
-
-progressBar: function(x)
-   {
-
-     this.pBcurrentW += x;
-
-    //  if(this.pBcurrentW == 500)
-    //  {
-    //   gameOver();
-    //   this.PlayAreaCtr.visible =false;
-    //   this.pigCtr.visible = false;
-    //  }
-     //
-    //  else{
-         this.graphics.beginFill(0xe68a00); // Dark blue gray 'ish
-         // Draw a rectangle with rounded corners
-         this.graphics.drawRoundedRect(this.marginLeft+152, this.marginTop+461, this.pBcurrentW, 15, 8); // drawRoundedRect(x, y, width, height, radius)
-         this.graphics.endFill();
-         this.PlayAreaCtr.addChild(this.graphics);
-         this.pigChangedPosition();
-        //  }
-   },
-
-   gameOver: function(){
-
-     var Text = PIXI.Text;
+        var Text = PIXI.Text;
         over = new Text(
-          "WOW...You won",
-          {fontFamily: "Bangers", fontSize: 52, fill: "orange"}
-           );
-      over.position.set(this.marginLeft+250, marginTop+430);
-      gameOverCtr.addChild(over);
-      app.stage.addChild(gameOverCtr);
+            "നമ്മൾ വിജയിച്ചു ചങ്ങാതി..", {
+                font: "bold 56px Chilanka",
+                fill: "orange"
+            }
+        );
+        over.position.set(this.marginLeft + 100, this.marginTop + 430);
+        this.gameOverSprite.position.set(this.marginLeft, this.marginTop);
+        this.gameOverCtr.addChild(this.gameOverSprite);
+        this.gameOverCtr.addChild(over);
+        app.stage.addChild(this.gameOverCtr);
 
-   }
+
+        setTimeout(hidegameOverCtr, 4000);
+        parent = this;
+
+        function hidegameOverCtr() {
+
+            parent.gameOverCtr.visible = false;
+            parent.prepareLevelsBackground(1);
+
+        }
+
+
+    }
 
 }
 

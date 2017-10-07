@@ -4,12 +4,9 @@
 <head>
     <meta charset="utf-8">
     <title>oop_game</title>
-    <link href='https://fonts.googleapis.com/css?family=Bangers' rel='stylesheet'>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
     <script src="game.js"></script>
-    <!-- <script src="level1.js"></script> -->
-    <!-- <script src="friendReaction.js"></script> -->
 
 </head>
 
@@ -28,7 +25,7 @@
 
         function Friend(texture, name, xPos) {
 
-            friendCntr = new PIXI.Container();
+            // friendCntr = new PIXI.Container();
             this.avatarCntr = new PIXI.Container();
             Game.call(this);
 
@@ -37,15 +34,22 @@
             PIXI.Sprite.call(this, texture);
 
             this.name = new PIXI.Text(name, {
-                fontFamily: "Bangers",
-                fontSize: 26,
-                fill: "orange"
+
+                fill: "orange",
+                font:"26px Chilanka",
+
             });
 
             this.interactive = true;
             this.buttonMode = true;
             this.accessible = true;
 
+function genetareCircle(){
+
+
+
+
+}
             this.orangeCircle = new PIXI.Graphics();
             this.orangeCircle.lineStyle(3, 0xFFFFFF, 1);
             this.orangeCircle.beginFill(0xE66D22, 1);
@@ -58,7 +62,8 @@
             this.anchor.set(.5, .5);
             this.position.set(xPos + 50, yPos + 60);
             this.scale.set(0.2, 0.2);
-            this.name.position.set(xPos, yPos + 150);
+            this.name.anchor.set(.5, .5);
+            this.name.position.set(xPos + 50, yPos + 145);
 
             this
                 .on('pointerover', generateInteraction)
@@ -68,8 +73,8 @@
             this.avatarCntr.addChild(this.orangeCircleSprite);
             this.avatarCntr.addChild(this);
             this.avatarCntr.addChild(this.name);
-            friendCntr.addChild(this.avatarCntr);
-            app.stage.addChild(friendCntr);
+            this.friendCntr.addChild(this.avatarCntr);
+            app.stage.addChild(this.friendCntr);
 
             function generateInteraction() {
 
@@ -77,13 +82,16 @@
                 this.orangeCircleSprite.anchor.set(.5, .5);
                 this.orangeCircleSprite.position.set(xPos + 50, yPos + 60);
                 this.scale.set(.25);
-
+                this.name.scale.set(1.1);
+                this.name.position.set(xPos + 50, yPos + 160);
             }
 
             function deleteInteraction() {
 
                 this.orangeCircleSprite.alpha = 0;
                 this.scale.set(.2);
+                this.name.scale.set(1);
+                  this.name.position.set(xPos + 50, yPos + 145);
 
             }
 
@@ -91,8 +99,9 @@
 
                 this.background.position.set(this.marginLeft, this.marginTop);
                 this.heading.position.set(this.marginLeft + 40, this.marginTop + 70);
-                friendCntr.addChild(this.background);
-                friendCntr.addChild(this.heading);
+                this.friendCntr.addChild(this.background);
+                this.friendCntr.addChild(this.heading);
+
                 spriteGap = 100;
                 for (var i = 1; i < 6; i++) {
                     this.circle = new PIXI.Graphics();
@@ -105,20 +114,21 @@
                     this.circleSprite.anchor.set(.5, .5);
                     this.circleSprite.position.set(this.marginLeft + spriteGap, yPos + 60);
                     this.circleSprite.alpha = 1;
-                    friendCntr.addChild(this.circleSprite);
+                    this.friendCntr.addChild(this.circleSprite);
                     spriteGap += 150;
                 }
             }
 
 
             this.click = function() {
+
                 this.avatarCntr.visible = false;
                 self = this;
                 var game = new Game();
                 game.prepareStage(self);
                 game.interAction();
                 game.displayStage();
-
+                game.selectAllSpritesOfFriend();
             }
 
         };
