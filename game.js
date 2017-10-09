@@ -1,6 +1,7 @@
 function Game() {
 
     this.friendInroCntr = new PIXI.Container();
+    this.avatarCntr = new PIXI.Container();
     this.PlayAreaCtr = new PIXI.Container();
     this.pigCtr = new PIXI.Container();
     this.levelsStageCtr = new PIXI.Container();
@@ -133,7 +134,10 @@ Game.prototype = {
         for (var i = 1; i < 6; i++) {
             this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i], xPos);
             xPos += 150;
+
         }
+
+   this.interAction(this.availableFriends);
 
     },
 
@@ -196,6 +200,7 @@ Game.prototype = {
         }
 
         function arrowInteractionOut() {
+
             parent.yellowArrow.alpha = 1;
             parent.orangeArrow.visible = false;
             parent.dialogueBox.visible = false;
@@ -205,6 +210,7 @@ Game.prototype = {
         }
 
         function display() {
+
             parent.friendInroCntr.addChild(parent.orangeArrow);
             parent.friendInroCntr.addChild(parent.dialogueBox);
             parent.friendInroCntr.addChild(parent.dialogueText);
@@ -218,7 +224,9 @@ Game.prototype = {
 
         }
 
-    },
+},
+// this.prepareLevelsBackground(this.availableFriends);
+
 
     displayStage: function() {
 
@@ -236,6 +244,7 @@ Game.prototype = {
         this.StarsSprite.visible = false;
         this.levelsBg.position.set(this.marginLeft, this.marginTop);
         this.StarsSprite.position.set(this.marginLeft + 160, this.marginTop + 225);
+        this.pigSprite.position.set(this.marginLeft + 178, this.marginTop + 175);
 
         if (l == 1) {
 
@@ -250,7 +259,11 @@ Game.prototype = {
     InteractLevelObject: function() {
 
 
-        this.pigSprite.position.set(this.marginLeft + 178, this.marginTop + 175);
+
+        this.pigSprite.x = this.marginLeft + 215;
+        this.pigSprite.y = this.marginTop + 205;
+        this.pigSprite.anchor.x = 0.5;
+        this.pigSprite.anchor.y = 0.5;
 
         this.pigSprite.interactive = true;
         this.pigSprite.buttonMode = true;
@@ -264,40 +277,31 @@ Game.prototype = {
 
         function levelObjInteraction() {
 
-            inside.pigSprite.x = inside.marginLeft + 215;
-            inside.pigSprite.y = inside.marginTop + 205;
-            inside.pigSprite.anchor.x = 0.5;
-            inside.pigSprite.anchor.y = 0.5;
-            // inside.pigSprite.rotation += 0;
 
-            for(var i=0;i<60;i++)
-            {
-              inside.pigSprite.rotation += 0.01;
-            }
+            // var tween1 = new Tween(inside.pigSprite, "position.x", 300, 60, false);
+            var tween1 = new Tween(inside.pigSprite, "rotation",.5, 200, false);
+                tween1.easing = Tween.outElastic;
+            new ChainedTween([tween1]);
+            
+            app.ticker.add(function(delta) {
 
-            // inside.levelsStageCtr.ticker.add(function() {
-            //
-            //
-            //     inside.pigSprite.clear();
-            //
-            //     inside.pigSprite.rotation += 1;
-            //
-            // });
+                   Tween.runTweens();
+
+              });
 
         }
 
         function levelObjInteractionOut() {
 
-            for(var i=0;i<60;i++)
-            {
-              inside.pigSprite.rotation -= 0.01;
-            }
-            // animate1();
-            // function animate1() {
-            //         inside.pigSprite.rotation -= .1;
-            //         requestAnimationFrame(animate1);
-            //     }
+          var tween1 = new Tween(inside.pigSprite, "rotation",-.5, 200, false);
+              tween1.easing = Tween.outElastic;
+          new ChainedTween([tween1]);
 
+          app.ticker.add(function(delta) {
+
+                 Tween.runTweens();
+
+            });
 
 
         }
@@ -320,180 +324,153 @@ Game.prototype = {
             fill: "orange"
         });
 
+        this.instructionText10 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ ഒരേ ദിശയിൽ ആണെങ്കിൽ", {
+            font: "bold 26px Chilanka",
+            fill: "orange"
+        });
+
+        this.instructionText11 = new PIXI.Text("ചിത്രങ്ങൾ ഒരേ ദിശയിൽ  വ്യത്യസ്ത ക്രമീകരണത്തിൽ ആണെങ്കിലും", {
+            font: "bold 26px Chilanka",
+            fill: "orange"
+        });
+
+        this.instructionText20 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ  വ്യത്യസ്ത ദിശയിൽ ആണെങ്കിൽ ", {
+            font: "bold 26px Chilanka",
+            fill: "orange"
+        });
+
+        this.instructionText21 = new PIXI.Text("ചിത്രങ്ങൾ വ്യത്യസ്ത ദിശയിലും ക്രമീകരണത്തിലും ആണെങ്കിലും", {
+            font: "bold 26px Chilanka",
+            fill: "orange"
+        });
+
+
         sW = this.marginLeft + this.marginLeft / 2;
 
         sH = (this.marginTop) *4;
 
         this.InstructionBgSprite.position.set(this.marginLeft, this.marginTop);
+        this.pressText.anchor.set(.5, .5);
+        this.pressText.position.set(this.marginLeft + 400, this.marginTop + 100);
+
+        this.instructionCtr.addChild(this.InstructionBgSprite);
+        this.instructionCtr.addChild(this.pressText);
+        app.stage.addChild(this.instructionCtr);
+
+        this.pigInitialPosition();
+        this.playArea();
+        this.displayPlayArea();
+        this.dispalyPigs();
 
         parent = this;
         firstInstruction();
-
+        displayfirstInstruction();
 
         function firstInstruction() {
 
-            this.insrtuction1Ctr = new PIXI.Container();
+          tickTexture = PIXI.Texture.fromImage('images/tick.png');
+          tickPic = new PIXI.Sprite(tickTexture);
 
-            tickTexture = PIXI.Texture.fromImage('images/tick.png');
-            tickPic = new PIXI.Sprite(tickTexture);
+          tickPic.anchor.set(.5, .5);
+          tickPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
+          tickPic.scale.set(.4,.4);
 
-            parent.instructionText1 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ ഒരേ ദിശയിൽ ആണെങ്കിൽ", {
-                font: "bold 26px Chilanka",
-                fill: "orange"
-            });
+          parent.instructionText10.anchor.set(.5, .5);
+          parent.instructionText10.position.set(parent.marginLeft + 400, parent.marginTop + 60);
 
-            parent.pressText.anchor.set(.5, .5);
-            parent.pressText.position.set(parent.marginLeft + 400, parent.marginTop + 100);
+          parent.handPointerSprite.position.set(parent.marginLeft + 400, parent.marginTop + 160);
 
-            parent.instructionText1.anchor.set(.5, .5);
-            parent.instructionText1.position.set(parent.marginLeft + 400, parent.marginTop + 60);
-
-            tickPic.anchor.set(.5, .5);
-            tickPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
-            tickPic.scale.set(.4,.4);
-
-            parent.handPointerSprite.position.set(sH + 370, sH + 270);
-            parent.handPointerSprite.scale.set(.45, .45);
-
-
-            displayInstruction1();
-            parent.pigInitialPosition();
-            parent.playArea();
-            parent.displayPlayArea();
-            parent.dispalyPigs();
-            parent.pig_lSprite.position.set(sW+162, sH+60);
-            parent.pig_lSprite.scale.set(.7,.7);
-            parent.pig_rSprite.position.set(sW+320, sH+60);
-            parent.pig_rSprite.scale.set(.7,.7);
-            parent.PlayAreaCtr.scale.set(.6,.6);
-            parent.PlayAreaCtr.position.set(sW, sH-50);
-
-
-            function displayInstruction1(){
-
-              this.insrtuction1Ctr.addChild(parent.InstructionBgSprite);
-              // insrtuction1Ctr.addChild(parent.handPointerSprite);
-              this.insrtuction1Ctr.addChild(parent.pressText);
-              this.insrtuction1Ctr.addChild(tickPic);
-
-              parent.instructionCtr.addChild(this.insrtuction1Ctr);
-              parent.instructionCtr.addChild(parent.instructionText1);
-
-              app.stage.addChild(parent.instructionCtr);
-              setTimeout(nextInstruction, 4000);
-            }
-
-
-
-            function nextInstruction(){
-
-            nextInstructionText = new PIXI.Text("ചിത്രങ്ങൾ ഒരേ ദിശയിൽ  വ്യത്യസ്ത ക്രമീകരണത്തിൽ ആണെങ്കിൽ ", {
-                font: "bold 26px Chilanka",
-                fill: "orange"
-            });
-            nextInstructionText.anchor.set(.5, .5);
-            nextInstructionText.position.set(parent.marginLeft + 400, parent.marginTop + 60);
-
-            parent.pig_lSprite.rotation= 1.5;
-            parent.pig_rSprite.rotation= .5;
-            parent.instructionText1.visible = false;
-
-            this.insrtuction1Ctr.addChild(nextInstructionText);
-
-            }
-
-            setTimeout(invisible, 8000);
-
-            function invisible() {
-                this.insrtuction1Ctr.visible = false;
-                secondInstruction();
-            }
-
+              parent.pig_lSprite.position.set(sW+162, sH+60);
+              parent.pig_lSprite.scale.set(-.7,.7);
+              parent.pig_rSprite.position.set(sW+320, sH+60);
+              parent.pig_rSprite.scale.set(.7,.7);
+              parent.PlayAreaCtr.scale.set(.6,.6);
+              parent.PlayAreaCtr.position.set(sW, sH-50);
 
         }
+        function displayfirstInstruction(){
 
-        function secondInstruction() {
+        parent.instructionCtr.addChild(tickPic);
+        parent.instructionCtr.addChild(parent.instructionText10);
+
+       }
+
+       setTimeout(firstInstruction11 ,6000);
+
+       function firstInstruction11(){
+
+         parent.instructionText10.visible = false;
+
+         parent.pig_lSprite.rotation= 1.5;
+         parent.pig_rSprite.rotation= .5;
+
+         setTimeout(pigRotationBack ,6000);
+
+         parent.instructionText11.anchor.set(.5, .5);
+         parent.instructionText11.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+         parent.instructionCtr.addChild(parent.instructionText11);
+
+       }
+
+       setTimeout(secondInstruction20 ,16000);
 
 
-            insrtuction2Ctr = new PIXI.Container();
+       function secondInstruction20(){
 
-            parent.instructionText2 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ ഒരേ ദിശയിൽ അല്ലങ്കിൽ", {
-                font: "bold 26px Chilanka",
-                fill: "orange"
-            });
+        crossTexture = PIXI.Texture.fromImage('images/cross.png');
+        crossPic = new PIXI.Sprite(crossTexture);
+        crossPic.anchor.set(.5, .5);
+        crossPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
+        crossPic.scale.set(.4,.4);
 
-            crossTexture = PIXI.Texture.fromImage('images/cross.png');
-            crossPic = new PIXI.Sprite(crossTexture);
+        parent.instructionText11.visible = false;
+        tickPic.visible = false;
+        parent.pig_lSprite.scale.set(.7,.7);
+        parent.instructionText20.anchor.set(.5, .5);
+        parent.instructionText20.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+        parent.instructionCtr.addChild(parent.instructionText20);
+        parent.instructionCtr.addChild(crossPic);
 
-            parent.pressText.anchor.set(.5, .5);
-            parent.pressText.position.set(parent.marginLeft + 400, parent.marginTop + 100);
+       }
 
-            parent.instructionText2.anchor.set(.5, .5);
-            parent.instructionText2.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+        setTimeout(secondInstruction21 ,22000);
 
-            parent.handPointerSprite.scale.x = -.5;
-            parent.handPointerSprite.position.set(sH + 700, sH + 270);
+       function secondInstruction21(){
 
-            crossPic.anchor.set(.5, .5);
-            crossPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
-            crossPic.scale.set(.4,.4);
+         parent.instructionText20.visible = false;
+
+         parent.pig_lSprite.rotation= 1.5;
+         parent.pig_rSprite.rotation= .5;
+
+         setTimeout(pigRotationBack ,6000);
+
+         parent.instructionText21.anchor.set(.5, .5);
+         parent.instructionText21.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+         parent.instructionCtr.addChild(parent.instructionText21);
+
+       }
+
+       function pigRotationBack(){
+
+         var tween1 = new Tween(parent.pig_lSprite, "rotation", -.05, 100, false);
+         tween1.easing = Tween.outCubic;
+
+         var tween2 = new Tween(parent.pig_rSprite, "rotation", -.05, 100, false);
+         tween2.easing = Tween.outCubic;
 
 
-            displayInstruction2();
-            parent.pigInitialPosition();
-            parent.playArea();
-            parent.displayPlayArea();
-            parent.dispalyPigs();
-            parent.pig_lSprite.position.set(sW+162, sH+60);
-            parent.pig_lSprite.scale.set(.7,.7);
-            parent.pig_rSprite.position.set(sW+320, sH+60);
-            parent.pig_rSprite.scale.set(.7,.7);
-            parent.PlayAreaCtr.scale.set(.6,.6);
-            parent.PlayAreaCtr.position.set(sW, sH-50);
+         new ChainedTween([tween1,tween2]);
 
-            setTimeout(invisible, 4000);
+         app.ticker.add(function(delta) {
 
-            function invisible() {
-                insrtuction2Ctr.visible = false;
-            }
+              	Tween.runTweens();
 
-              function displayInstruction2(){
+           });
 
-                insrtuction2Ctr.addChild(parent.InstructionBgSprite);
-                // insrtuction2Ctr.addChild(parent.handPointerSprite);
-                insrtuction2Ctr.addChild(parent.pressText);
-                insrtuction2Ctr.addChild(crossPic);
+       }
 
-                parent.instructionCtr.addChild(insrtuction2Ctr);
-                parent.instructionCtr.addChild(parent.instructionText2);
 
-                app.stage.addChild(parent.instructionCtr);
-                setTimeout(nextInstruction, 4000);
-
-              }
-
-              function nextInstruction(){
-
-              nextInstructionText = new PIXI.Text("വ്യത്യസ്ത ദിശയിൽ ഒരേ ചിത്രങ്ങൾ വ്യത്യസ്ത ക്രമീകരണത്തിൽ ആണെങ്കിൽ ", {
-                  font: "bold 26px Chilanka",
-                  fill: "orange"
-              });
-              nextInstructionText.anchor.set(.5, .5);
-              nextInstructionText.position.set(parent.marginLeft + 400, parent.marginTop + 60);
-
-              parent.pig_lSprite.rotation= 1.5;
-              parent.pig_rSprite.rotation= .5;
-              parent.instructionText1.visible = false;
-
-              this.insrtuction1Ctr.addChild(nextInstructionText);
-
-              }
-
-        }
-
-        setTimeout(invisibleTheCtnr, 14000);
-
-        parent = this;
+        setTimeout(invisibleTheCtnr, 32000);
 
         function invisibleTheCtnr() {
 
@@ -828,7 +805,7 @@ Game.prototype = {
 
         this.pBcurrentW += x;
 
-        if (this.pBcurrentW == 500) {
+        if (this.pBcurrentW == 100) {
             this.gameOver();
             this.PlayAreaCtr.visible = false;
             this.pigCtr.visible = false;

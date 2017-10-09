@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <title>oop_game</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
+    <script src="pixi.min.js"></script>
+    <script src="tween.js"></script>
     <script src="game.js"></script>
 
 </head>
@@ -15,6 +16,8 @@
         var app = new PIXI.Application(window.innerWidth, window.innerHeight);
 
         document.body.appendChild(app.view);
+
+        app.renderer.backgroundColor = 0x152039;
 
         function inheritPrototype(childObject, parentObject) {
             var copyOfParent = Object.create(parentObject.prototype);
@@ -26,7 +29,7 @@
         function Friend(texture, name, xPos) {
 
             // friendCntr = new PIXI.Container();
-            this.avatarCntr = new PIXI.Container();
+
             Game.call(this);
 
             yPos = this.marginTop + 200;
@@ -44,20 +47,23 @@
             this.buttonMode = true;
             this.accessible = true;
 
-function genetareCircle(){
+            parent = this;
+
+            function generateCircle(clr){
+
+              parent.Circle = new PIXI.Graphics();
+              parent.Circle.lineStyle(3, 0xFFFFFF, 1);
+              parent.Circle.beginFill(clr, 1);
+              parent.Circle.drawCircle(60, 60, 50);
+              parent.Circle.endFill();
+              parent.CircleTexture = parent.Circle.generateTexture();
+              parent.CircleSprite = new PIXI.Sprite(parent.CircleTexture);
+              parent.CircleSprite.alpha = 0;
 
 
+            }
 
-
-}
-            this.orangeCircle = new PIXI.Graphics();
-            this.orangeCircle.lineStyle(3, 0xFFFFFF, 1);
-            this.orangeCircle.beginFill(0xE66D22, 1);
-            this.orangeCircle.drawCircle(60, 60, 50);
-            this.orangeCircle.endFill();
-            this.orangeCircleTexture = this.orangeCircle.generateTexture();
-            this.orangeCircleSprite = new PIXI.Sprite(this.orangeCircleTexture);
-            this.orangeCircleSprite.alpha = 0;
+            generateCircle(0xE66D22);
 
             this.anchor.set(.5, .5);
             this.position.set(xPos + 50, yPos + 60);
@@ -69,8 +75,7 @@ function genetareCircle(){
                 .on('pointerover', generateInteraction)
                 .on('pointerout', deleteInteraction)
 
-
-            this.avatarCntr.addChild(this.orangeCircleSprite);
+            this.avatarCntr.addChild(this.CircleSprite);
             this.avatarCntr.addChild(this);
             this.avatarCntr.addChild(this.name);
             this.friendCntr.addChild(this.avatarCntr);
@@ -78,9 +83,9 @@ function genetareCircle(){
 
             function generateInteraction() {
 
-                this.orangeCircleSprite.alpha = 1;
-                this.orangeCircleSprite.anchor.set(.5, .5);
-                this.orangeCircleSprite.position.set(xPos + 50, yPos + 60);
+                this.CircleSprite.alpha = 1;
+                this.CircleSprite.anchor.set(.5, .5);
+                this.CircleSprite.position.set(xPos + 50, yPos + 60);
                 this.scale.set(.25);
                 this.name.scale.set(1.1);
                 this.name.position.set(xPos + 50, yPos + 160);
@@ -88,10 +93,10 @@ function genetareCircle(){
 
             function deleteInteraction() {
 
-                this.orangeCircleSprite.alpha = 0;
+                this.CircleSprite.alpha = 0;
                 this.scale.set(.2);
                 this.name.scale.set(1);
-                  this.name.position.set(xPos + 50, yPos + 145);
+                this.name.position.set(xPos + 50, yPos + 145);
 
             }
 
@@ -102,19 +107,15 @@ function genetareCircle(){
                 this.friendCntr.addChild(this.background);
                 this.friendCntr.addChild(this.heading);
 
-                spriteGap = 100;
+                spriteGap = 48.5;
                 for (var i = 1; i < 6; i++) {
-                    this.circle = new PIXI.Graphics();
-                    this.circle.lineStyle(3, 0xFFFFFF, 1);
-                    this.circle.beginFill(0xFFC62A, 1);
-                    this.circle.drawCircle(60, 60, 50);
-                    this.circle.endFill();
-                    this.circleTexture = this.circle.generateTexture();
-                    this.circleSprite = new PIXI.Sprite(this.circleTexture);
-                    this.circleSprite.anchor.set(.5, .5);
-                    this.circleSprite.position.set(this.marginLeft + spriteGap, yPos + 60);
-                    this.circleSprite.alpha = 1;
-                    this.friendCntr.addChild(this.circleSprite);
+
+                    generateCircle(0xFFC62A);
+                    //orange circle
+                    // this.orangeCircleSprite.position.set(this.marginLeft + spriteGap, yPos + 60);
+                    this.CircleSprite.position.set(this.marginLeft + spriteGap, yPos+9);
+                    this.CircleSprite.alpha = 1;
+                    this.friendCntr.addChild(this.CircleSprite);
                     spriteGap += 150;
                 }
             }
@@ -122,15 +123,14 @@ function genetareCircle(){
 
             this.click = function() {
 
-                this.avatarCntr.visible = false;
                 self = this;
                 var game = new Game();
                 game.prepareStage(self);
                 game.interAction();
                 game.displayStage();
                 game.selectAllSpritesOfFriend();
-            }
 
+            }
         };
 
         inheritPrototype(Friend, PIXI.Sprite);
