@@ -1,4 +1,17 @@
 function Game() {
+  
+this.array = [];
+  // for (i = 0; i < 5; i++) {
+  //
+  //     this.array[i] = [];
+  // }
+  //Scale to fit and center
+ this.size = new PIXI.Rectangle(0,0,window.innerWidth, window.innerHeight);
+ this.s = this.size.width/800;
+if(this.s > this.size.height/500) this.s = this.size.height/500;
+
+// this.gameArea.scale.x = this.gameArea.scale.y = s;
+// this.gameArea.x = Math.round((size.width-this.gameArea.width)/2);
 
     this.friendInroCntr = new PIXI.Container();
     this.avatarCntr = new PIXI.Container();
@@ -29,7 +42,7 @@ function Game() {
     });
     this.heading.width = 600;
 
-    this.bg = PIXI.Texture.fromImage('images/0.png');
+    this.bg = PIXI.Texture.fromImage('images/gameBg.png');
     this.background = new PIXI.Sprite(this.bg);
 
     this.textureBg = PIXI.Texture.fromImage('images/background.png');
@@ -129,23 +142,37 @@ Game.prototype = {
 
         var xPos = this.marginLeft + 50;
         var yPos = this.marginTop + 200;
-        this.availableFriendsName = ["", "ബെൻ10", "ഡോറ ", "മിക്കിമൗസ് ", "ചോട്ടാഭീം ", "ടോം "];
+        this.availableFriendsName = ["ബെൻ10", "ഡോറ ", "മിക്കിമൗസ് ", "ചോട്ടാഭീം ", "ടോം "];
 
-        for (var i = 1; i < 6; i++) {
+        for (var i = 0; i < 5; i++) {
+
             this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i], xPos);
             xPos += 150;
 
         }
 
-   this.interAction(this.availableFriends);
-
     },
 
     prepareStage: function(self) {
 
-        self
-            .on('pointerover', friendInteraction)
-            .on('pointerout', friendInteractionOut)
+      // PIXI.Sprite("images/1.png".texture).visible = false;
+//       profile = new PIXI.Sprite(
+//          PIXI.loader.resources["images/1.png"].texture
+//          );
+// profile.interactive = false;
+      // parent = this;
+      // for (var i = 1; i < 6; i++) {
+      //
+      //     parent.availableFriends.interactive = false;
+      //
+      // }
+
+        // self
+        //     .on('pointerover', friendInteraction)
+        //     .on('pointerout', friendInteractionOut)
+          self.interactive = false;
+          self.buttonMode = false;
+          self.accessible = false;
 
         function friendInteraction() {
 
@@ -162,12 +189,13 @@ Game.prototype = {
 
         }
 
-        self.scale.set(.5);
+        self.scale.set(.6);
         self.name.scale.set(1.2);
         self.position.set(this.marginLeft - 50, this.marginTop + 200);
-        self.name.position.set(this.marginLeft + 50, this.marginTop + 350);
+        self.name.position.set(this.marginLeft + 80, this.marginTop + 350);
         this.friendInroCntr.position.set(this.marginLeft, this.marginTop);
 
+        // this.friendCntr.visible = false;
     },
 
 
@@ -282,7 +310,7 @@ Game.prototype = {
             var tween1 = new Tween(inside.pigSprite, "rotation",.5, 200, false);
                 tween1.easing = Tween.outElastic;
             new ChainedTween([tween1]);
-            
+
             app.ticker.add(function(delta) {
 
                    Tween.runTweens();
@@ -805,7 +833,7 @@ Game.prototype = {
 
         this.pBcurrentW += x;
 
-        if (this.pBcurrentW == 100) {
+        if (this.pBcurrentW == 500) {
             this.gameOver();
             this.PlayAreaCtr.visible = false;
             this.pigCtr.visible = false;

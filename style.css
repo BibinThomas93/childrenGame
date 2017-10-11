@@ -2,3 +2,25 @@ body {
 overflow: hidden;
 background-color: rgb(21,32,57);
 }
+
+/*@font-face {
+font-family: "Chilanka Bold";
+src:url("css/Chilanka-Regular.ttf");
+src:
+url("css/fonts/chilanka-regular-webfont.woff") format("woff"),
+url("css/fonts/chilanka-regular-webfont.woff2") format("woff"),
+/*url("css/fonts/Harabara.svg#filename") format("svg");*/
+ @font-face {
+    font-family: 'chilankaregular';
+    src: url('css/chilanka-regular-webfont.woff2') format('woff2'),
+         url('css/chilanka-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+canvas {
+
+    font-family: 'chilankaregular';
+
+   }
