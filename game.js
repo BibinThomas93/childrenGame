@@ -1,28 +1,16 @@
 function Game() {
-  
-this.array = [];
-  // for (i = 0; i < 5; i++) {
-  //
-  //     this.array[i] = [];
-  // }
-  //Scale to fit and center
- this.size = new PIXI.Rectangle(0,0,window.innerWidth, window.innerHeight);
- this.s = this.size.width/800;
-if(this.s > this.size.height/500) this.s = this.size.height/500;
-
-// this.gameArea.scale.x = this.gameArea.scale.y = s;
-// this.gameArea.x = Math.round((size.width-this.gameArea.width)/2);
 
     this.friendInroCntr = new PIXI.Container();
     this.avatarCntr = new PIXI.Container();
     this.PlayAreaCtr = new PIXI.Container();
+    this.PlayArea2Ctr = new PIXI.Container();
+
     this.pigCtr = new PIXI.Container();
     this.levelsStageCtr = new PIXI.Container();
     this.reactionCtr = new PIXI.Container();
     this.gameOverCtr = new PIXI.Container();
     this.instructionCtr = new PIXI.Container();
     this.friendCntr = new PIXI.Container();
-    this.graphics = new PIXI.Graphics();
 
     this.myarray = [];
     this.stagesNum = 20;
@@ -31,11 +19,14 @@ if(this.s > this.size.height/500) this.s = this.size.height/500;
     this.pBcurrentW = 0;
 
     this.availableFriends = [];
+    this.playSprite1 = [];
+    this.playSprite2 = [];
     this.windowWidth = window.innerWidth;
-    this.marginLeft = (window.innerWidth - 800) / 2;
-    this.marginTop = (window.innerHeight - 500) / 2;
+    h = window.innerHeight/500;
+    this.marginLeft = ((window.innerWidth - 800*h*1.1) / 2);
+    this.marginTop = ((window.innerHeight - 500*h) / 2);
 
-    this.heading = new PIXI.Text("ആരാണ് നിന്റെ ചങ്ങാതി?", {
+    this.heading = new PIXI.Text("കൂട്ടുകാരനെ തിരഞ്ഞെടുക്കാം!", {
 
         fill: "orange",
         font: "bold 56px Chilanka",
@@ -67,8 +58,10 @@ if(this.s > this.size.height/500) this.s = this.size.height/500;
     this.levelsBg = new PIXI.Sprite(this.textureLevelsBg);
 
 
-    this.texturePig = PIXI.Texture.fromImage('images/pig.png');
-    this.pigSprite = new PIXI.Sprite(this.texturePig);
+    this.dogSprite = new PIXI.Sprite(PIXI.Texture.fromImage('images/dog.png'));
+
+    this.pigSprite = new PIXI.Sprite(PIXI.Texture.fromImage('images/pig.png'));
+
 
 
     this.texturePointer = PIXI.Texture.fromImage('images/pointing_hand.png');
@@ -79,6 +72,8 @@ if(this.s > this.size.height/500) this.s = this.size.height/500;
 
     this.texturePicBase = PIXI.Texture.fromImage('images/stage1/picBase.png');
     this.picBaseSprite = new PIXI.Sprite(this.texturePicBase);
+
+    this.level2BaseSprite = new PIXI.Sprite(PIXI.Texture.fromImage('images/stage2/picBase.png'));
 
 
     this.texturePlayArea = PIXI.Texture.fromImage('images/bg.png');
@@ -130,23 +125,35 @@ if(this.s > this.size.height/500) this.s = this.size.height/500;
     this.textureDoraGameOver = PIXI.Texture.fromImage('images/gameOver_dora.png');
     this.DoraGameOverSprite = new PIXI.Sprite(this.textureDoraGameOver);
 
-    this.textureStars = PIXI.Texture.fromImage('images/stars.png');
-    this.StarsSprite = new PIXI.Sprite(this.textureStars);
+    this.StarsSprite = new PIXI.Sprite(PIXI.Texture.fromImage('images/stars.png'));
+    this.StarsSprite1 = new PIXI.Sprite(PIXI.Texture.fromImage('images/stars.png'));
+
+    for (var i = 0; i < 5; i++) {
+
+        this.playSprite1[i] = PIXI.Texture.fromImage("images/stage2/" + i + ".png");
+        this.playSprite2[i] = PIXI.Texture.fromImage("images/stage2/1" + i + ".png");
+
+    }
+    // for (var i = 0; i < 5; i++) {
+    //
+    //       this.avatars = new PIXI.Sprite(PIXI.Texture.fromImage("images/" + i + ".png"));
+    //
+    // }
 
 };
 
 Game.prototype = {
 
     constructor: Game,
-    initGameFriends: function(resources) {
+    initGameFriends: function() {
 
         var xPos = this.marginLeft + 50;
         var yPos = this.marginTop + 200;
-        this.availableFriendsName = ["ബെൻ10", "ഡോറ ", "മിക്കിമൗസ് ", "ചോട്ടാഭീം ", "ടോം "];
+        this.availableFriendsName = ["പപ്പി", "ബഡാ ഭീം", "കുഞ്ഞാവ", "ഉണ്ണിക്കുട്ടൻ", "മിങ്കൻ"];
 
         for (var i = 0; i < 5; i++) {
 
-            this.availableFriends[i] = new Friend(resources["images/" + i + ".png"].texture, this.availableFriendsName[i], xPos);
+            this.availableFriends[i] = new Friend(PIXI.Texture.fromImage("images/" + i + ".png"), this.availableFriendsName[i], xPos);
             xPos += 150;
 
         }
@@ -155,53 +162,39 @@ Game.prototype = {
 
     prepareStage: function(self) {
 
-      // PIXI.Sprite("images/1.png".texture).visible = false;
-//       profile = new PIXI.Sprite(
-//          PIXI.loader.resources["images/1.png"].texture
-//          );
-// profile.interactive = false;
-      // parent = this;
-      // for (var i = 1; i < 6; i++) {
-      //
-      //     parent.availableFriends.interactive = false;
-      //
-      // }
+        self.interactive = false;
+        self.buttonMode = false;
+        self.accessible = false;
 
-        // self
-        //     .on('pointerover', friendInteraction)
-        //     .on('pointerout', friendInteractionOut)
-          self.interactive = false;
-          self.buttonMode = false;
-          self.accessible = false;
+        self.position.set(230, 200);
+        self.scale.set(.5);
+        textOfAvatar = new PIXI.Text("എന്നെ തിരഞ്ഞെടുത്തതിനു നന്ദി! ഞാൻ", {
 
-        function friendInteraction() {
+            fill: "orange",
+            font:"26px Chilanka",
 
-            self.scale.set(.5);
-            self.name.scale.set(1.25);
-            self.name.position.set(this.marginLeft + 100, this.marginTop + 330);
+        });
 
-        }
-
-        function friendInteractionOut() {
-            self.scale.set(.5);
-            self.name.scale.set(1.25);
-            self.name.position.set(this.marginLeft + 100, this.marginTop + 330);
-
-        }
-
-        self.scale.set(.6);
-        self.name.scale.set(1.2);
-        self.position.set(this.marginLeft - 50, this.marginTop + 200);
-        self.name.position.set(this.marginLeft + 80, this.marginTop + 350);
+        self.name.position.set(605, 415);
+        self.name.scale.set(1);
+        textOfAvatar.position.set(100, 400);
+        this.dialogueBox.scale.set(1.2);
+        this.dialogueBox.position.set(300, 50);
         this.friendInroCntr.position.set(this.marginLeft, this.marginTop);
 
-        // this.friendCntr.visible = false;
     },
-
 
     interAction: function() {
 
-        this.yellowArrow.position.set(this.marginLeft + 300, this.marginTop + 150);
+      textOfAvatarDialogue = new PIXI.Text("കളി തുടങ്ങാൻ\nആരോയിൽ\n\t\t\tതൊടാം", {
+
+          fill: "white",
+          font:"26px Chilanka",
+
+      });
+        textOfAvatarDialogue.anchor.set(0.5, 0.5);
+        textOfAvatarDialogue.position.set(440, 120);
+        this.yellowArrow.position.set(600, 200);
         this.yellowArrow.interactive = true;
         this.yellowArrow.accessible = true;
         this.yellowArrow.buttonMode = true;
@@ -214,24 +207,25 @@ Game.prototype = {
 
         function arrowInteraction() {
 
+            textOfAvatarDialogue.visible = false;
+
             parent.yellowArrow.alpha = 0;
             parent.orangeArrow.visible = true;
             parent.dialogueText.visible = true;
-            parent.dialogueBox.visible = true;
-
-            parent.orangeArrow.position.set(parent.marginLeft + 310, parent.marginTop + 150);
-            parent.dialogueText.position.set(parent.marginLeft + 40, parent.marginTop + 35);
-            parent.dialogueBox.position.set(parent.marginLeft, parent.marginTop);
+            // parent.dialogueBox.visible = true;
+            parent.orangeArrow.position.set(620, 200);
+            parent.dialogueText.position.set(360, 95);
 
             display();
-
         }
 
         function arrowInteractionOut() {
 
+            textOfAvatarDialogue.visible = true;
+
             parent.yellowArrow.alpha = 1;
             parent.orangeArrow.visible = false;
-            parent.dialogueBox.visible = false;
+            // parent.dialogueBox.visible = false;
             parent.dialogueText.visible = false;
             parent.yellowArrow.alpha = 1;
 
@@ -240,7 +234,6 @@ Game.prototype = {
         function display() {
 
             parent.friendInroCntr.addChild(parent.orangeArrow);
-            parent.friendInroCntr.addChild(parent.dialogueBox);
             parent.friendInroCntr.addChild(parent.dialogueText);
         }
 
@@ -252,14 +245,15 @@ Game.prototype = {
 
         }
 
-},
-// this.prepareLevelsBackground(this.availableFriends);
-
+    },
 
     displayStage: function() {
 
         this.friendInroCntr.addChild(this.background1);
         this.friendInroCntr.addChild(self);
+        this.friendInroCntr.addChild(this.dialogueBox);
+        this.friendInroCntr.addChild(textOfAvatar);
+        this.friendInroCntr.addChild(textOfAvatarDialogue);
         this.friendInroCntr.addChild(self.name);
         this.friendInroCntr.addChild(this.yellowArrow);
         app.stage.addChild(this.friendInroCntr);
@@ -269,14 +263,47 @@ Game.prototype = {
 
     prepareLevelsBackground: function(l) {
 
+        // console.log(this._texture.textureCacheIds);
+        this.levelText = new PIXI.Text("പടികൾ( ഘട്ടങ്ങൾ )", {
+            font: "bold 56px Chilanka",
+            fill: "orange"
+        });
+
         this.StarsSprite.visible = false;
+        this.StarsSprite1.visible = false;
         this.levelsBg.position.set(this.marginLeft, this.marginTop);
+        this.levelText.position.set(this.marginLeft + 130, this.marginTop + 50);
         this.StarsSprite.position.set(this.marginLeft + 160, this.marginTop + 225);
-        this.pigSprite.position.set(this.marginLeft + 178, this.marginTop + 175);
+        this.StarsSprite1.position.set(this.marginLeft + 345, this.marginTop + 225);
+        this.dogSprite.position.set(this.marginLeft + 178, this.marginTop + 175);
+        this.pigSprite.position.set(this.marginLeft + 362, this.marginTop + 175);
+
+
+        this.dogSprite.interactive = true;
+        this.dogSprite.buttonMode = true;
+        this.dogSprite.accessible = true;
+
+        this.pigSprite.interactive = true;
+        this.pigSprite.buttonMode = true;
+        this.pigSprite.accessible = true;
 
         if (l == 1) {
 
+            this.dogSprite.interactive = false;
+            this.dogSprite.buttonMode = false;
+            this.dogSprite.accessible = false;
+
             this.StarsSprite.visible = true;
+            this.levelsStageCtr.visible = true;
+        }
+        if (l == 2) {
+
+            this.pigSprite.interactive = false;
+            this.pigSprite.buttonMode = false;
+            this.pigSprite.accessible = false;
+
+            this.StarsSprite.visible = true;
+            this.StarsSprite1.visible = true;
             this.levelsStageCtr.visible = true;
         }
 
@@ -286,103 +313,120 @@ Game.prototype = {
 
     InteractLevelObject: function() {
 
+        this.dogSprite.x = this.marginLeft + 215;
+        this.dogSprite.y = this.marginTop + 205;
+        this.dogSprite.anchor.x = 0.5;
+        this.dogSprite.anchor.y = 0.5;
 
-
-        this.pigSprite.x = this.marginLeft + 215;
-        this.pigSprite.y = this.marginTop + 205;
-        this.pigSprite.anchor.x = 0.5;
-        this.pigSprite.anchor.y = 0.5;
-
-        this.pigSprite.interactive = true;
-        this.pigSprite.buttonMode = true;
-        this.pigSprite.accessible = true;
-
-        this.pigSprite
+        this.dogSprite
             .on('pointerover', levelObjInteraction)
             .on('pointerout', levelObjInteractionOut)
+
+        // this.pigSprite
+        //     .on('pointerover', levelObjInteraction)
+        //     .on('pointerout', levelObjInteractionOut)
+
 
         var inside = this;
 
         function levelObjInteraction() {
 
-
-            // var tween1 = new Tween(inside.pigSprite, "position.x", 300, 60, false);
-            var tween1 = new Tween(inside.pigSprite, "rotation",.5, 200, false);
+            var tween1 = new Tween(inside.dogSprite, "position.x", 300, 60, false);
+            var tween1 = new Tween(inside.dogSprite, "rotation",.5, 200, false);
                 tween1.easing = Tween.outElastic;
+
+            // var tween1 = new Tween(inside.dogSprite, "position.y", 215, 60, false);
+            // tween1.easing = Tween.outElastic;
+
             new ChainedTween([tween1]);
 
             app.ticker.add(function(delta) {
 
-                   Tween.runTweens();
+                Tween.runTweens();
 
-              });
+            });
 
         }
 
         function levelObjInteractionOut() {
 
-          var tween1 = new Tween(inside.pigSprite, "rotation",-.5, 200, false);
-              tween1.easing = Tween.outElastic;
-          new ChainedTween([tween1]);
+            var tween1 = new Tween(inside.dogSprite, "rotation",-.5, 200, false);
+                tween1.easing = Tween.outElastic;
+            // var tween1 = new Tween(inside.dogSprite, "position.y", 205, 60, false);
+            // tween1.easing = Tween.outElastic;
+            new ChainedTween([tween1]);
 
-          app.ticker.add(function(delta) {
+            app.ticker.add(function(delta) {
 
-                 Tween.runTweens();
+                Tween.runTweens();
 
             });
 
+        }
 
+        this.dogSprite.click = function() {
+
+            inside.levelsStageCtr.visible = false;
+
+            inside.instructionVideo();
         }
 
         this.pigSprite.click = function() {
 
             inside.levelsStageCtr.visible = false;
 
-            inside.instructionVideo();
+            // inside.playArea2();
+            inside.insructionVideoLevel2();
         }
         this.displayLevels();
+
+    },
+
+    displayLevels: function() {
+
+        this.levelsStageCtr.addChild(this.levelsBg);
+        this.levelsStageCtr.addChild(this.dogSprite);
+        this.levelsStageCtr.addChild(this.pigSprite);
+
+        this.levelsStageCtr.addChild(this.StarsSprite);
+        this.levelsStageCtr.addChild(this.StarsSprite1);
+        this.levelsStageCtr.addChild(this.levelText);
+        app.stage.addChild(this.levelsStageCtr);
 
     },
 
 
     instructionVideo: function() {
 
-        this.pressText = new PIXI.Text("ബട്ടൺ അമർത്തുക ", {
-            font: "bold 26px Chilanka",
+        this.pressText = new PIXI.Text("അമർത്താം ", {
+            font: "bold 30px Chilanka",
             fill: "orange"
         });
 
-        this.instructionText10 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ ഒരേ ദിശയിൽ ആണെങ്കിൽ", {
-            font: "bold 26px Chilanka",
+        this.instructionText10 = new PIXI.Text("താഴെയുള്ള രണ്ട് വൃത്തങ്ങളിലെ ചിത്രങ്ങൾ ശ്രദ്ധിക്കൂ..", {
+            font: "bold 30px Chilanka",
             fill: "orange"
         });
 
-        this.instructionText11 = new PIXI.Text("ചിത്രങ്ങൾ ഒരേ ദിശയിൽ  വ്യത്യസ്ത ക്രമീകരണത്തിൽ ആണെങ്കിലും", {
-            font: "bold 26px Chilanka",
+        this.instructionText11 = new PIXI.Text("അവ ഒരേ ദിശയിലാണെങ്കിൽ ശരി", {
+            font: "bold 30px Chilanka",
             fill: "orange"
         });
 
-        this.instructionText20 = new PIXI.Text("വൃത്തത്തിനുള്ളിലെ ചിത്രങ്ങൾ  വ്യത്യസ്ത ദിശയിൽ ആണെങ്കിൽ ", {
-            font: "bold 26px Chilanka",
+        this.instructionText20 = new PIXI.Text("അവ വ്യത്യസ്ത ദിശയിലാണെങ്കിൽ തെറ്റ്", {
+            font: "bold 30px Chilanka",
             fill: "orange"
         });
 
         this.instructionText21 = new PIXI.Text("ചിത്രങ്ങൾ വ്യത്യസ്ത ദിശയിലും ക്രമീകരണത്തിലും ആണെങ്കിലും", {
-            font: "bold 26px Chilanka",
+            font: "bold 30px Chilanka",
             fill: "orange"
         });
 
-
-        sW = this.marginLeft + this.marginLeft / 2;
-
-        sH = (this.marginTop) *4;
-
         this.InstructionBgSprite.position.set(this.marginLeft, this.marginTop);
-        this.pressText.anchor.set(.5, .5);
-        this.pressText.position.set(this.marginLeft + 400, this.marginTop + 100);
 
         this.instructionCtr.addChild(this.InstructionBgSprite);
-        this.instructionCtr.addChild(this.pressText);
+
         app.stage.addChild(this.instructionCtr);
 
         this.pigInitialPosition();
@@ -391,114 +435,94 @@ Game.prototype = {
         this.dispalyPigs();
 
         parent = this;
-        firstInstruction();
-        displayfirstInstruction();
+        firstInstruction11();
+        displayfirstInstruction11();
 
-        function firstInstruction() {
 
-          tickTexture = PIXI.Texture.fromImage('images/tick.png');
-          tickPic = new PIXI.Sprite(tickTexture);
+        function firstInstruction11() {
 
-          tickPic.anchor.set(.5, .5);
-          tickPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
-          tickPic.scale.set(.4,.4);
+              tickTexture = PIXI.Texture.fromImage('images/tick.png');
+              tickPic = new PIXI.Sprite(tickTexture);
+              tickPic.anchor.set(.5, .5);
+              tickPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
+              tickPic.scale.set(.4, .4);
+              crossTexture = PIXI.Texture.fromImage('images/cross.png');
+              crossPic = new PIXI.Sprite(crossTexture);
+              crossPic.anchor.set(.5, .5);
+              crossPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
+              crossPic.scale.set(.4, .4);
+              parent.pressText.visible = false;
+              tickPic.visible = false;
 
-          parent.instructionText10.anchor.set(.5, .5);
-          parent.instructionText10.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+              parent.pressText.anchor.set(.5, .5);
+              parent.pressText.position.set(parent.marginLeft + 400, parent.marginTop + 100);
 
-          parent.handPointerSprite.position.set(parent.marginLeft + 400, parent.marginTop + 160);
+              parent.instructionText10.anchor.set(.5, .5);
+              parent.instructionText10.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+              parent.instructionText11.anchor.set(.5, .5);
+              parent.instructionText11.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+              // parent.handPointerSprite.position.set(parent.marginLeft + 400, parent.marginTop + 160);
+              parent.pig_lSprite.position.set( 473, 260);
+              parent.pig_lSprite.scale.set(-.7, .7);
+              parent.pig_rSprite.position.set( 633, 260);
+              parent.pig_rSprite.scale.set(.7, .7);
+              parent.PlayAreaCtr.scale.set(.6, .6);
+              parent.PlayAreaCtr.position.set(310, 150);
 
-              parent.pig_lSprite.position.set(sW+162, sH+60);
-              parent.pig_lSprite.scale.set(-.7,.7);
-              parent.pig_rSprite.position.set(sW+320, sH+60);
-              parent.pig_rSprite.scale.set(.7,.7);
-              parent.PlayAreaCtr.scale.set(.6,.6);
-              parent.PlayAreaCtr.position.set(sW, sH-50);
+              parent.instructionText10.visible = true;
+              parent.instructionText11.visible = false;
+
+            parent.pig_lSprite.rotation = 1.5;
+            parent.pig_rSprite.rotation = .5;
+
+            setTimeout(function() {
+                parent.SpriteRotationBack(parent.pig_lSprite, parent.pig_rSprite)
+            }, 4000);
+            setTimeout(instructionToDo
+          , 5000);
+
+            function instructionToDo(){
+
+            parent.pressText.visible = true;
+            tickPic.visible = true;
+            parent.instructionText10.visible = false;
+            parent.instructionText11.visible = true;
+            }
 
         }
-        function displayfirstInstruction(){
 
-        parent.instructionCtr.addChild(tickPic);
-        parent.instructionCtr.addChild(parent.instructionText10);
+        function displayfirstInstruction11() {
 
-       }
+            parent.instructionCtr.addChild(tickPic);
+            parent.instructionCtr.addChild(parent.instructionText10);
+            parent.instructionCtr.addChild(parent.pressText);
+            parent.instructionCtr.addChild(parent.instructionText11);
 
-       setTimeout(firstInstruction11 ,6000);
+        }
 
-       function firstInstruction11(){
-
-         parent.instructionText10.visible = false;
-
-         parent.pig_lSprite.rotation= 1.5;
-         parent.pig_rSprite.rotation= .5;
-
-         setTimeout(pigRotationBack ,6000);
-
-         parent.instructionText11.anchor.set(.5, .5);
-         parent.instructionText11.position.set(parent.marginLeft + 400, parent.marginTop + 60);
-         parent.instructionCtr.addChild(parent.instructionText11);
-
-       }
-
-       setTimeout(secondInstruction20 ,16000);
+        setTimeout(secondInstruction20, 9000);
 
 
-       function secondInstruction20(){
+        function secondInstruction20() {
 
-        crossTexture = PIXI.Texture.fromImage('images/cross.png');
-        crossPic = new PIXI.Sprite(crossTexture);
-        crossPic.anchor.set(.5, .5);
-        crossPic.position.set(parent.marginLeft + 250, parent.marginTop + 105);
-        crossPic.scale.set(.4,.4);
+            parent.pig_lSprite.rotation = 1.5;
+            parent.pig_rSprite.rotation = .5;
 
-        parent.instructionText11.visible = false;
-        tickPic.visible = false;
-        parent.pig_lSprite.scale.set(.7,.7);
-        parent.instructionText20.anchor.set(.5, .5);
-        parent.instructionText20.position.set(parent.marginLeft + 400, parent.marginTop + 60);
-        parent.instructionCtr.addChild(parent.instructionText20);
-        parent.instructionCtr.addChild(crossPic);
+            parent.instructionText11.visible = false;
+            tickPic.visible = false;
+            parent.pig_lSprite.scale.set(.7, .7);
+            parent.instructionText20.anchor.set(.5, .5);
+            parent.instructionText20.position.set(parent.marginLeft + 400, parent.marginTop + 60);
+            parent.instructionCtr.addChild(parent.instructionText20);
+            parent.instructionCtr.addChild(crossPic);
 
-       }
+            setTimeout(function() {
+                parent.SpriteRotationBack(parent.pig_lSprite, parent.pig_rSprite)
+            }, 4000);
 
-        setTimeout(secondInstruction21 ,22000);
+        }
 
-       function secondInstruction21(){
-
-         parent.instructionText20.visible = false;
-
-         parent.pig_lSprite.rotation= 1.5;
-         parent.pig_rSprite.rotation= .5;
-
-         setTimeout(pigRotationBack ,6000);
-
-         parent.instructionText21.anchor.set(.5, .5);
-         parent.instructionText21.position.set(parent.marginLeft + 400, parent.marginTop + 60);
-         parent.instructionCtr.addChild(parent.instructionText21);
-
-       }
-
-       function pigRotationBack(){
-
-         var tween1 = new Tween(parent.pig_lSprite, "rotation", -.05, 100, false);
-         tween1.easing = Tween.outCubic;
-
-         var tween2 = new Tween(parent.pig_rSprite, "rotation", -.05, 100, false);
-         tween2.easing = Tween.outCubic;
-
-
-         new ChainedTween([tween1,tween2]);
-
-         app.ticker.add(function(delta) {
-
-              	Tween.runTweens();
-
-           });
-
-       }
-
-
-        setTimeout(invisibleTheCtnr, 32000);
+        setTimeout(invisibleTheCtnr, 16000);
 
         function invisibleTheCtnr() {
 
@@ -513,30 +537,17 @@ Game.prototype = {
 
     },
 
-
-
-    displayLevels: function() {
-
-        this.levelsStageCtr.addChild(this.levelsBg);
-        this.levelsStageCtr.addChild(this.pigSprite);
-        this.levelsStageCtr.addChild(this.StarsSprite);
-        app.stage.addChild(this.levelsStageCtr);
-
-    },
-
-
     //Start to play , In future it may changed as class
-
 
     playArea: function() {
 
         // this.playAreaSprite.position.set(this.marginLeft, this.marginTop);
         this.playAreaSprite.scale.set(1, 1);
         this.tickSprite.scale.set(.6, .6);
-        this.tickSprite.position.set(this.marginLeft+30 , this.marginTop + 220);
+        this.tickSprite.position.set(315, 285);
         this.crossSprite.scale.set(.6, .6);
-        this.crossSprite.position.set(this.marginLeft + 130, this.marginTop + 220);
-        this.PlayAreaCtr.scale.set(1,1);
+        this.crossSprite.position.set(415, 285);
+        this.PlayAreaCtr.scale.set(1, 1);
         this.PlayAreaCtr.position.set(this.marginLeft, this.marginTop);
 
     },
@@ -574,14 +585,14 @@ Game.prototype = {
 
                 if ((j == 0) && (i < f)) {
 
-                    this.myarray[i][j] = nfV;
+                    this.myarray[i][j] = fV;
 
                 }
                 //For second half
 
                 if ((j == 0) && (i >= f)) {
 
-                    this.myarray[i][j] = fV;
+                    this.myarray[i][j] = nfV;
 
                 }
 
@@ -611,7 +622,6 @@ Game.prototype = {
 
         }
 
-
     },
 
     pigInitialPosition: function() {
@@ -622,8 +632,8 @@ Game.prototype = {
         this.pig_rSprite.x = this.marginLeft + 540;
         this.pig_rSprite.y = this.marginTop + 190;
 
-        this.pig_lSprite.scale.set(1,1);
-        this.pig_rSprite.scale.set(1,1);
+        this.pig_lSprite.scale.set(1, 1);
+        this.pig_rSprite.scale.set(1, 1);
         this.pig_lSprite.rotation = 0;
         this.pig_rSprite.rotation = 0;
         this.pig_rSprite.anchor.set(0.5, 0.5);
@@ -633,18 +643,7 @@ Game.prototype = {
 
     pigChangedPosition: function() {
 
-        this.pig_lSprite.x = this.marginLeft + 270;
-        this.pig_lSprite.y = this.marginTop + 190;
-
-        this.pig_rSprite.x = this.marginLeft + 540;
-        this.pig_rSprite.y = this.marginTop + 190;
-
-        this.pig_lSprite.scale.x = 1;
-        this.pig_rSprite.scale.x = 1;
-        this.pig_lSprite.rotation = 0;
-        this.pig_rSprite.rotation = 0;
-        this.pig_rSprite.anchor.set(0.5, 0.5);
-        this.pig_lSprite.anchor.set(0.5, 0.5);
+        this.pigInitialPosition()
 
         var num = Math.floor((Math.random() * 3) + 1);
         var lev = Math.floor((Math.random() * this.stagesNum - 1) + 1);
@@ -678,6 +677,7 @@ Game.prototype = {
     dispalyPigs: function() {
         this.pigCtr.addChild(this.pig_rSprite);
         this.pigCtr.addChild(this.pig_lSprite);
+        this.PlayAreaCtr.addChild(this.pigCtr);
         app.stage.addChild(this.pigCtr);
     },
 
@@ -697,18 +697,18 @@ Game.prototype = {
 
             if (num == 3) {
 
-                parent.sad();
+                parent.sad(1);
 
             } else {
                 if (flip == 1) {
 
-                    parent.sad();
+                    parent.sad(1);
 
                 }
 
                 if (flip == -1) {
 
-                    parent.happy();
+                    parent.happy(1);
                 }
 
             }
@@ -719,19 +719,19 @@ Game.prototype = {
 
 
             if (num == 3) {
-                parent.happy();
+                parent.happy(1);
 
             } else {
 
                 if (flip == -1) {
 
-                    parent.sad();
+                    parent.sad(1);
 
                 }
 
                 if (flip == 1) {
 
-                    parent.happy();
+                    parent.happy(1);
                 }
 
             }
@@ -741,43 +741,292 @@ Game.prototype = {
     },
 
 
-    happy: function() {
+   insructionVideoLevel2: function(){
+
+    instructionCtr = new PIXI.Container();
+
+
+    instructionText = new PIXI.Text("താഴെയുള്ള നാല് വൃത്തങ്ങളിലെ ചിത്രങ്ങൾ ശ്രദ്ധിക്കൂ..", {
+        font: "bold 30px Chilanka",
+        fill: "orange"
+    });
+
+    instructionText1 = new PIXI.Text("അവയിലെ സമാന ചിത്രങ്ങളിൽ അമർത്തുക", {
+        font: "bold 30px Chilanka",
+        fill: "orange"
+    });
+    instructionText1.alpha = 0;
+
+setTimeout(next , 4000)
+    function next(){
+
+      instructionText1.alpha = 1;
+      instructionText.alpha = 0;
+
+    }
+
+    this.InstructionBgSprite.position.set(this.marginLeft , this.marginTop);
+    instructionText.anchor.set(.5,.5);
+    instructionText1.anchor.set(.5,.5);
+    instructionText.position.set(this.marginLeft+400, this.marginTop+50);
+    instructionText1.position.set(this.marginLeft+400, this.marginTop+50);
+    instructionCtr.addChild(this.InstructionBgSprite);
+    instructionCtr.addChild(instructionText);
+    instructionCtr.addChild(instructionText1);
+    app.stage.addChild(instructionCtr);
+    this.playArea2(1);
+    this.PlayArea2Ctr.scale.set(.6,.6);
+    this.PlayArea2Ctr.position.set(this.marginLeft+100, this.marginTop+100);
+    parent = this;
+    setTimeout(invisibleTheCtnr, 12000);
+
+    function invisibleTheCtnr() {
+
+        instructionCtr.visible = false;
+        parent.calcAndDisplay();
+
+    }
+    },
+
+    playArea2: function(l) {
+
+        PlaySpriteCtr = new PIXI.Container();
+        PlaySpriteCtr.visible = false;
+        this.calculation();
+
+        var select = Math.floor(Math.random() * 5);
+        alert(select)
+
+        this.spriteArray = [];
+        this.spriteArray[0] = new PIXI.Sprite(this.playSprite1[select]);
+        this.spriteArray[2] = new PIXI.Sprite(this.playSprite1[select]);
+
+        if(select==4){
+        this.spriteArray[4] = new PIXI.Sprite(this.playSprite1[2]);
+        this.spriteArray[3] = new PIXI.Sprite(this.playSprite1[3]);
+        this.spriteArray[1] = new PIXI.Sprite(this.playSprite1[3]);
+        }
+
+        if((select!=4)&&(select!=0)) {
+        this.spriteArray[4] = new PIXI.Sprite(this.playSprite1[select-1]);
+        this.spriteArray[3] = new PIXI.Sprite(this.playSprite1[select+1]);
+        this.spriteArray[1] = new PIXI.Sprite(this.playSprite1[select+1]);
+        }
+        if(select==0) {
+        this.spriteArray[4] = new PIXI.Sprite(this.playSprite1[select+1]);
+        this.spriteArray[3] = new PIXI.Sprite(this.playSprite1[select+2]);
+        this.spriteArray[1] = new PIXI.Sprite(this.playSprite1[select+2]);
+        }
+        this.level2BaseSprite.position.set(this.marginLeft, this.marginTop);
+        this.calcAndDisplay(l);
+    },
+
+    calcAndDisplay: function(l) {
+
+        PlaySpriteCtr.visible = true;
+
+        this.PlayArea2Ctr.position.set(0, 0);
+
+        this.PlayArea2Ctr.scale.set(1,1)
+
+        this.PlayArea2Ctr.addChild(this.level2BaseSprite);
+
+        parent = this;
+        var firstTile = null;
+        // second tile picked up by the player
+        var secondTile = null;
+        // can the player pick up a tile?
+        var canPick = true;
+        var N = 5;
+        var X = [330, 470, 260, 400,540];
+        var Y = [180, 180, 310, 310,310];
+        for (i = 0; i < 5; i++) {
+            // for (j = 0; j < 2; j++) {
+                // new sprite
+                var tile = this.spriteArray[i];
+                yellowCircle = new PIXI.Sprite(PIXI.Texture.fromImage('images/stage2/orangeCircle.png'));
+                tile.alpha = 1
+                // buttonmode = acts like a button
+                if(l==1){
+                  tile.buttonMode = false;
+                  tile.interactive = false;
+                  pare = this;
+                  setTimeout(function() {
+                    pare.SpriteRotationBack(pare.spriteArray[0],pare.spriteArray[1]);
+                  },8000);
+                  setTimeout(function() {
+                    pare.SpriteRotationBack(pare.spriteArray[2],pare.spriteArray[3]);
+                  },9000);
+                }
+                else{
+                tile.buttonMode = true;
+                tile.interactive = true;
+                 }
+                // is the tile selected?
+                tile.isSelected = false;
+                // set a tile value
+                // alert(this.spriteArray.length)
+                if(i<this.spriteArray.length-1)
+                tile.theVal = i%2;
+                else {
+                tile.theVal = i;
+                }
+
+                var num = Math.floor((Math.random() * 3) + 1);
+                var lev = Math.floor((Math.random() * this.stagesNum - 1) + 1);
+                var flip = this.myarray[lev][0];
+                var rotation = this.myarray[lev][1];
+
+                var pos = Math.floor(Math.random() * N);
+                tile.anchor.set(.5, .5);
+                yellowCircle.anchor.set(.5, .5);
+                // tile.scale.x = flip;
+                tile.rotation = rotation;
+                tile.position.set(this.marginLeft + X[pos], this.marginTop + Y[pos]);
+                yellowCircle.position.set(this.marginLeft + X[pos], this.marginTop + Y[pos]);
+                // alert(X[pos],Y[pos])
+                PlaySpriteCtr.addChild(yellowCircle);
+                PlaySpriteCtr.addChild(tile);
+                this.PlayArea2Ctr.addChild(PlaySpriteCtr);
+                // mouse-touch listener
+                counter = 0;
+                tile.mousedown = tile.touchstart = function(data) {
+                    // can I pick a tile?
+                    if (canPick) {
+                        // is the tile already selected?
+                        if (!this.isSelected) {
+
+                            // set the tile to selected
+                            this.isSelected = true;
+
+                            // is it the first tile we uncover?
+                            if (firstTile == null) {
+                                firstTile = this
+                            }
+                            // this is the second tile
+                            else {
+                                secondTile = this
+                                // can't pick anymore
+                                canPick = false;
+                                // did we pick the same tiles?
+
+                                if (firstTile.theVal == secondTile.theVal) {
+                                    // wait a second then remove the tiles and make the player able to pick again
+                                    setTimeout(function() {
+
+                                        parent.SpriteRotationBack(firstTile, secondTile);
+                                        firstTile = null;
+                                        secondTile = null;
+                                        canPick = true;
+
+                                        if (counter == 1) {
+                                            setTimeout(function() {
+                                                parent.happy(2)
+
+                                            }, 1500);
+
+                                        }
+                                        counter += 1;
+                                    }, 500);
+                                }
+                                // we picked different tiles
+                                else {
+                                    // wait a second then cover the tiles and make the player able to pick again
+                                    setTimeout(function() {
+
+                                        firstTile.isSelected = false
+                                        secondTile.isSelected = false
+                                        // parent.sad(2);
+                                        firstTile = null;
+                                        secondTile = null;
+                                        canPick = true
+                                    }, 1000);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                X.splice(pos, 1);
+                Y.splice(pos, 1);
+                N = N - 1;
+            // }
+        }
+
+        app.stage.addChild(this.PlayArea2Ctr);
+
+    },
+
+
+    happy: function(lvalue) {
+
+              tickText = new PIXI.Text("ശരി", {
+                  font: "bold 46px Chilanka",
+                  fill: "orange"
+              });
+
+        console.log(this.marginLeft)
 
         this.reactionCtr.visible = true;
         this.happySprite.position.set(this.marginLeft, this.marginTop);
+        tickText.position.set(this.marginLeft+100, this.marginTop+20);
         this.reactionCtr.addChild(this.happySprite);
+        this.reactionCtr.addChild(tickText);
 
         app.stage.addChild(this.reactionCtr);
 
-        setTimeout(hideReactionCtr, 1300);
+        if (lvalue == 1)
+            setTimeout(hideReactionCtr1, 1300);
+
+        else if (lvalue == 2)
+            setTimeout(hideReactionCtr2, 1300);
 
         var callObj = this.playbj;
         parent = this;
 
-        function hideReactionCtr() {
+        function hideReactionCtr1() {
 
             parent.reactionCtr.visible = false;
             parent.pigChangedPosition();
 
             setTimeout(function() {
-                parent.progressBar(parent.pBWidth);
+                parent.progressBar(50, lvalue);
+            }, 100)
+        }
+
+        function hideReactionCtr2() {
+
+            parent.reactionCtr.visible = false;
+            parent.playArea2();
+              // parent.playArea2(2)
+
+            setTimeout(function() {
+                parent.progressBar(50, lvalue);
+
             }, 100)
         }
 
     },
 
-    sad: function() {
+    sad: function(lvalue) {
+
+      crossText = new PIXI.Text("തെറ്റിപ്പോയല്ലോ!", {
+          font: "bold 46px Chilanka",
+          fill: "orange"
+      });
 
         this.reactionCtr.visible = true;
         this.sadSprite.position.set(this.marginLeft, this.marginTop);
+        crossText.position.set(this.marginLeft+100, this.marginTop+20);
         this.reactionCtr.addChild(this.sadSprite);
+        this.reactionCtr.addChild(crossText);
         app.stage.addChild(this.reactionCtr);
 
+        if (lvalue == 1)
+            setTimeout(hideReactionCtr1, 1300);
 
-        setTimeout(hideReactionCtr, 1300);
         parent = this;
-
-        function hideReactionCtr() {
+        function hideReactionCtr1() {
 
             parent.reactionCtr.visible = false;
             parent.pigChangedPosition();
@@ -789,14 +1038,14 @@ Game.prototype = {
     selectAllSpritesOfFriend: function() {
         var compare = self._texture.textureCacheIds
 
-        if (compare == "images/1.png") {
+        if (compare == "images/0.png") {
             this.happySprite = this.Ben10HappySprite;
             this.sadSprite = this.Ben10SadSprite;
             this.gameOverSprite = this.Ben10GameOverSprite;
 
         }
 
-        if (compare == "images/2.png") {
+        if (compare == "images/1.png") {
 
 
             this.happySprite = this.DoraHappySprite;
@@ -804,14 +1053,14 @@ Game.prototype = {
             this.gameOverSprite = this.DoraGameOverSprite;
         }
 
-        if (compare == "images/3.png") {
+        if (compare == "images/2.png") {
 
             this.happySprite = this.MickiHappySprite;
             this.sadSprite = this.MickiSadSprite;
             this.gameOverSprite = this.MickiGameOverSprite;
         }
 
-        if (compare == "images/4.png") {
+        if (compare == "images/3.png") {
 
             this.happySprite = this.ChottaHappySprite;
             this.sadSprite = this.ChottaSadSprite;
@@ -819,7 +1068,7 @@ Game.prototype = {
 
         }
 
-        if (compare == "images/5.png") {
+        if (compare == "images/4.png") {
 
             this.happySprite = this.TomHappySprite;
             this.sadSprite = this.TomSadSprite;
@@ -829,25 +1078,70 @@ Game.prototype = {
 
     },
 
-    progressBar: function(x) {
+    SpriteRotationBack: function(first, second) {
 
-        this.pBcurrentW += x;
+        var tween1 = new Tween(first, "rotation", -.05, 100, false);
+        tween1.easing = Tween.outCubic;
 
-        if (this.pBcurrentW == 500) {
-            this.gameOver();
-            this.PlayAreaCtr.visible = false;
-            this.pigCtr.visible = false;
-        } else {
-            this.graphics.beginFill(0xe68a00); // Dark blue gray 'ish
-            // Draw a rectangle with rounded corners
-            this.graphics.drawRoundedRect(this.marginLeft-131 , this.marginTop + 396, this.pBcurrentW, 15, 8); // drawRoundedRect(x, y, width, height, radius)
-            this.graphics.endFill();
-            this.PlayAreaCtr.addChild(this.graphics);
+        var tween2 = new Tween(second, "rotation", -.05, 100, false);
+        tween2.easing = Tween.outCubic;
 
-        }
+
+        new ChainedTween([tween1, tween2]);
+
+        app.ticker.add(function(delta) {
+
+            Tween.runTweens();
+
+        });
+
     },
 
-    gameOver: function() {
+    progressBar: function(x, lvalue) {
+
+        graphics = new PIXI.Graphics();
+        console.log(this.pBcurrentW)
+
+        if (lvalue == 1) {
+
+            this.pBcurrentW += x;
+            graphics.beginFill(0xe68a00);
+            // drawRoundedRect(x, y, width, height, radius)
+            graphics.drawRoundedRect(151, 461, this.pBcurrentW, 15, 8);
+            graphics.endFill();
+
+            this.PlayAreaCtr.addChild(graphics);
+
+            if (this.pBcurrentW == 500) {
+                this.gameOver(lvalue);
+                this.PlayAreaCtr.visible = false;
+                this.pigCtr.visible = false;
+
+            }
+        }
+        else if (lvalue == 2) {
+
+            this.pBcurrentW += x;
+            graphics.beginFill(0xe68a00);
+            // drawRoundedRect(x, y, width, height, radius)
+            graphics.drawRoundedRect(this.marginLeft + 151, this.marginTop + 463, this.pBcurrentW, 15, 8);
+            graphics.endFill();
+
+            this.PlayArea2Ctr.addChild(graphics);
+
+            if (this.pBcurrentW == 500) {
+                this.gameOver(lvalue);
+                this.PlayArea2Ctr.visible = false;
+
+            }
+        }
+
+    },
+
+    gameOver: function(lvalue) {
+
+        parent.gameOverCtr.visible = true;
+        this.pBcurrentW = 0;
 
         var Text = PIXI.Text;
         over = new Text(
@@ -862,35 +1156,32 @@ Game.prototype = {
         this.gameOverCtr.addChild(over);
         app.stage.addChild(this.gameOverCtr);
 
-
-        setTimeout(hidegameOverCtr, 4000);
+        setTimeout(function(){hidegameOverCtr(lvalue);}, 4000);
         parent = this;
 
-        function hidegameOverCtr() {
+        function hidegameOverCtr(lvalue) {
 
             parent.gameOverCtr.visible = false;
-            parent.prepareLevelsBackground(1);
+            parent.prepareLevelsBackground(lvalue);
 
         }
-
 
     }
 
 }
 
-
 PIXI.loader.add('images/1.png')
     .add('images/2.png')
     .add('images/3.png')
     .add('images/4.png')
-    .add('images/5.png')
-    .add('images/0.png').load(function(loader, resources) {
+    .add('images/0.png')
+    .load(function(loader, resources) {
 
         var friendObj = new Friend();
         friendObj.prepareBackground(resources);
 
         var game = new Game();
-        game.initGameFriends(resources);
+        game.initGameFriends();
 
 
 
