@@ -134,11 +134,12 @@ function Game() {
         this.playSprite2[i] = PIXI.Texture.fromImage("images/stage2/1" + i + ".png");
 
     }
-    // for (var i = 0; i < 5; i++) {
-    //
-    //       this.avatars = new PIXI.Sprite(PIXI.Texture.fromImage("images/" + i + ".png"));
-    //
-    // }
+    this.avatars=[];
+    for (var i = 0; i < 5; i++) {
+
+          this.avatars[i] = PIXI.Texture.fromImage("images/" + i + ".png");
+
+    }
 
 };
 
@@ -153,7 +154,7 @@ Game.prototype = {
 
         for (var i = 0; i < 5; i++) {
 
-            this.availableFriends[i] = new Friend(PIXI.Texture.fromImage("images/" + i + ".png"), this.availableFriendsName[i], xPos);
+            this.availableFriends[i] = new Friend(this.avatars[i], this.availableFriendsName[i], xPos);
             xPos += 150;
 
         }
@@ -1096,6 +1097,7 @@ setTimeout(next , 4000)
         });
 
     },
+
 
     progressBar: function(x, lvalue) {
 

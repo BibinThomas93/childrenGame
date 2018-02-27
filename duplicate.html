@@ -8,19 +8,20 @@
     <script src="pixi.min.js"></script>
     <script src="tween.js"></script>
     <script src="game.js"></script>
+    <!-- <script src="playLevels.js"></script> -->
 
 </head>
 
 <body>
+
     <script>
 
-
         var app = new PIXI.Application(window.innerWidth, window.innerHeight);
-
         document.body.appendChild(app.view);
-
         app.renderer.backgroundColor = 0x152039;
-
+        h = window.innerHeight/500;
+        app.stage.scale.set(h,h);
+        // app.stage.position.set(0,0);
         function inheritPrototype(childObject, parentObject) {
             var copyOfParent = Object.create(parentObject.prototype);
             copyOfParent.constructor = childObject;
@@ -29,21 +30,23 @@
 
         function Friend(texture, name, xPos) {
 
+            // Game.call(this);
             var game = new Game();
+
             yPos = game.marginTop + 200;
 
-            this.fSprite = new PIXI.Sprite(texture);
+            PIXI.Sprite.call(this, texture);
 
-            this.fSprite.name = new PIXI.Text(name, {
+            this.name = new PIXI.Text(name, {
 
                 fill: "orange",
                 font:"26px Chilanka",
 
             });
 
-            this.fSprite.interactive = true;
-            this.fSprite.buttonMode = true;
-            this.fSprite.accessible = true;
+            this.interactive = true;
+            // this.buttonMode = true;
+            this.accessible = true;
 
             parents = this;
 
@@ -60,43 +63,41 @@
 
             }
 
-            generateCircle(0xE66D22);//orange circle
+            this.anchor.set(.5, .5);
+            this.position.set(xPos + 50, yPos + 60);
+            this.scale.set(0.2, 0.2);
+            this.name.anchor.set(.5, .5);
+            this.name.position.set(xPos + 50, yPos + 145);
 
-            this.fSprite.anchor.set(.5, .5);
-            this.fSprite.position.set(xPos + 50, yPos + 60);
-            this.fSprite.scale.set(0.2, 0.2);
-            this.fSprite.name.anchor.set(.5, .5);
-            this.fSprite.name.position.set(xPos + 50, yPos + 145);
-            //
-            // this.fSprite.hitArea = new PIXI.Rectangle(-150, -150, 300, 300);
-
-            this.fSprite
+            this
                 .on('pointerover', generateInteraction)
                 .on('pointerout', deleteInteraction)
 
+            generateCircle(0xE66D22);//orange circle
+
             game.avatarCntr.addChild(this.CircleSprite);
-            game.avatarCntr.addChild(this.fSprite);
-            game.avatarCntr.addChild(this.fSprite.name);
+            game.avatarCntr.addChild(this);
+            game.avatarCntr.addChild(this.name);
             game.friendCntr.addChild(game.avatarCntr);
             app.stage.addChild(game.friendCntr);
 
-            k = this;
-            function generateInteraction() {
+            function generateInteraction(){
 
-                k.CircleSprite.alpha = 1;
-                k.CircleSprite.anchor.set(.5, .5);
-                k.CircleSprite.position.set(xPos + 50, yPos + 60);
-                // k.scale.set(.25);
-                // k.name.scale.set(1.1);
-                // k.name.position.set(xPos + 50, yPos + 160);
+                this.CircleSprite.alpha = 1;
+                this.CircleSprite.anchor.set(.5, .5);
+                this.CircleSprite.position.set(xPos + 50, yPos + 60);
+                this.scale.set(.25);
+                this.name.scale.set(1.1);
+                this.name.position.set(xPos + 50, yPos + 160);
+
              }
 
             function deleteInteraction() {
 
-                k.CircleSprite.alpha = 0;
-                // k.scale.set(.2);
-                // k.name.scale.set(1);
-                // k.name.position.set(xPos + 50, yPos + 145);
+                this.CircleSprite.alpha = 0;
+                this.scale.set(.2);
+                this.name.scale.set(1);
+                this.name.position.set(xPos + 50, yPos + 145);
 
             }
 
@@ -117,22 +118,29 @@
                     game.friendCntr.addChild(this.CircleSprite);
                     spriteGap += 150;
                 }
+
+
+            }
+            value = game;
+            this.disable = function(){
+                value.avatarCntr.parent.interactiveChildren = false
             }
 
-            this.fSprite.on('click', nextOne)
-            pare = this;
+            this.on('click', nextOne)
 
-            function nextOne() {
-
-                self = pare.fSprite;
+            function nextOne(available) {
+                self = this;
+                friendObj = new Friend();
                 game.prepareStage(self);
                 game.interAction();
                 game.displayStage();
                 game.selectAllSpritesOfFriend();
-                game.avatarCntr.visible = false;
+                friendObj.disable()
+                // value.avatarCntr.visible = false;
+
+
             }
         };
-
 
         inheritPrototype(Friend, PIXI.Sprite);
 
